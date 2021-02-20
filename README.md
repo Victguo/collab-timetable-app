@@ -34,5 +34,6 @@
 ### Top 5 technical challenges
 - Making it mobile friendly
 - Real time synchronization with editing timeslots
-- Implementing notification system
-- 
+- Implementing SMS Messaging for notifications
+- Using an external email API to send an email for notifications 
+- Generating and ensuring invite links are unique (and also adding a time limit before a link expires)
