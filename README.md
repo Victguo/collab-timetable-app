@@ -11,6 +11,7 @@
     - Users will have the option to fill out timeslots with an event, and the slot will display their name, the title of the event, and an optional description and location of the event
         - Users with edit access can edit slots (for example to add their own name to it if 2 people are in the same class)
     - There will be a notification option where users can be notified prior to an event (like text or email)
+- Timetables can only be accessed by either directly inviting another user, or by creating an invite link and people with the link will have access
 
 
 ### Key features that will be completed by the Beta version
