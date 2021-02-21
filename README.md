@@ -1,5 +1,4 @@
-# Title
-Project DiamondHands
+# Project DiamondHands
 
 ## Team members
 - Joe Liu
