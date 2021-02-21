@@ -1,4 +1,5 @@
 # Title
+Project DiamondHands
 
 ## Team members
 - Joe Liu
@@ -18,7 +19,7 @@
 - Users can create/delete timetables and share with other users
     - Only shared users can access the timetable
 - Users can fill out timeslots with events
-- Users will receive notifications prior to event and on event update
+- Users can receive notifications prior to event and on event update
 
 ### Additional features that will be complete by the Final version
 - Hosting on custom domain
