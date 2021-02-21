@@ -15,7 +15,7 @@
 
 ### Key features that will be completed by the Beta version
 - Fetch updates every few seconds (updates or new timeslots)
-- Users can create timetables and share with other users
+- Users can create/delete timetables and share with other users
     - Only shared users can access the timetable
 - Users can fill out timeslots with events
 - Users will receive notifications prior to event and on event update
