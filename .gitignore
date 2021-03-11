@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+# node.js
+*-lock.json
+/src/database
+
 # testing
 /coverage
 
