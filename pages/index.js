@@ -5,7 +5,6 @@ import Dashboard from '../components/Dashboard'
 import { connectToDatabase } from '../backend/mongodb'
 
 export default function Home({isConnected}) {
-  console.log("the database is " + isConnected);
 
   return (
     // <Layout home>

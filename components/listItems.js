@@ -9,45 +9,28 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import FormDialog from './FormDialog';
 
 export const mainListItems = (
   <div>
-    <ListItem button>
+    {/* <ListItem button>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <ShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Orders" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="Customers" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Reports" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <LayersIcon />
-      </ListItemIcon>
-      <ListItemText primary="Integrations" />
-    </ListItem>
+      <ListItemText primary="Create new Timetable" onClick={} />
+    </ListItem> */}
+    <FormDialog>
+      
+    </FormDialog>
   </div>
 );
 
-export const secondaryListItems = (
-  <div>
-    <ListSubheader inset>Saved reports</ListSubheader>
+export let timetables;
+
+export default function GetTimetables() {
+
+  timetables = (<div>
+    <ListSubheader inset>Your Timetables</ListSubheader>
     <ListItem button>
       <ListItemIcon>
         <AssignmentIcon />
@@ -67,4 +50,18 @@ export const secondaryListItems = (
       <ListItemText primary="Year-end sale" />
     </ListItem>
   </div>
-);
+  );
+  return timetables;
+};
+
+export async function getServerSideProps(context) {
+  const { client } = await connectToDatabase()
+
+  const isConnected = await client.isConnected()
+
+  // console.log(context);
+
+  return {
+    props: { isConnected },
+  }
+}
