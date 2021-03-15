@@ -1,47 +1,22 @@
 {
-  "name": "project-diamondhands",
+  "name": "learn-starter",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.11.9",
-    "@testing-library/react": "^11.2.5",
-    "@testing-library/user-event": "^12.8.1",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1",
-    "graphql": "^15.5.0",
-    "jslint": "^0.12.1",
-    "mongodb": "^3.6.4",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.0"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "eslint": "^7.21.0",
-    "eslint-plugin-react": "^7.22.0"
+  "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "classnames": "^2.2.6",
+    "moment": "^2.29.1",
+    "mongodb": "^3.6.4",
+    "next": "^10.0.0",
+    "react": "^16.13.0",
+    "react-big-calendar": "^0.33.2",
+    "react-dom": "^16.13.0",
+    "recharts": "^2.0.8"
   }
 }
