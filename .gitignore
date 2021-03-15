@@ -6,6 +6,10 @@
 /.pnp
 .pnp.js
 
+# node.js
+*-lock.json
+/src/database
+
 # testing
 /coverage
 
@@ -22,3 +26,4 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
