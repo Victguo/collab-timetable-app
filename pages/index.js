@@ -2,7 +2,7 @@
 // import Layout, { siteTitle } from '../components/layout'
 // import utilStyles from '../styles/utils.module.css'
 import Dashboard from '../components/Dashboard'
-import { connectToDatabase } from '../server/mongodb'
+import { connectToDatabase } from '../backend/mongodb'
 
 export default function Home({isConnected}) {
   console.log("the database is " + isConnected);
