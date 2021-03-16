@@ -13,12 +13,12 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 // import Grid from '@material-ui/core/Grid';
-// import Paper from '@material-ui/core/Paper';
+import Paper from '@material-ui/core/Paper';
 // import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import GetTimetables, { mainListItems } from './listItems';
+import GetTimetables, { mainListItems } from './GetTimetables';
 // import Chart from './Chart';
 // import Deposits from './Deposits';
 import { Calendar, momentLocalizer } from "react-big-calendar";
@@ -27,7 +27,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const localizer = momentLocalizer(moment);
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -108,9 +108,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+export default function Dashboard({timetables}) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const [currTimetable, selectTimetable] = React.useState();
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -129,6 +130,7 @@ export default function Dashboard() {
       }
     ]
   };
+  // console.log(timetables);
 
   return (
     <div className={classes.root}>
@@ -169,9 +171,7 @@ export default function Dashboard() {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        <List>
-          <GetTimetables></GetTimetables>
-        </List> 
+        <GetTimetables timetables={timetables}></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -182,7 +182,7 @@ export default function Dashboard() {
                 defaultDate={new Date()}
                 defaultView="month"
                 events={state.events}
-                style={{ height: "90vh" }}
+                style={{ height: "80vh" }}
             />
         </Container>
       </main>

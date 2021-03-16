@@ -11,7 +11,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import AddIcon from '@material-ui/icons/Add';
 
-export default function FormDialog() {
+export default function NewTimetableDialog() {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -24,11 +24,11 @@ export default function FormDialog() {
 
   return (
     <div>
-      <ListItem button>
+      <ListItem button onClick={() => handleClickOpen()}>
         <ListItemIcon>
           <AddIcon />
         </ListItemIcon>
-        <ListItemText primary="Create Timetable" onClick={() => handleClickOpen()} />
+        <ListItemText primary="Create Timetable" />
       </ListItem>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">New Timetable</DialogTitle>
@@ -50,7 +50,7 @@ export default function FormDialog() {
             Cancel
           </Button>
           <Button onClick={handleClose} color="primary">
-            Subscribe
+            Create
           </Button>
         </DialogActions>
       </Dialog>
