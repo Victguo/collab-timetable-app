@@ -2,10 +2,8 @@
 // import Layout, { siteTitle } from '../components/layout'
 // import utilStyles from '../styles/utils.module.css'
 import Dashboard from '../components/Dashboard'
-import { connectToDatabase } from '../backend/mongodb'
 
-export default function Home({isConnected}) {
-  console.log("the database is " + isConnected);
+export default function Home() {
 
   return (
     // <Layout home>
@@ -25,16 +23,4 @@ export default function Home({isConnected}) {
 
     </Dashboard>
   )
-}
-
-export async function getServerSideProps(context) {
-  const { client } = await connectToDatabase()
-
-  const isConnected = await client.isConnected()
-
-  // console.log(context);
-
-  return {
-    props: { isConnected },
-  }
 }
