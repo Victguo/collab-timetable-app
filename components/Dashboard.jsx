@@ -12,22 +12,18 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-// import Grid from '@material-ui/core/Grid';
-// import Paper from '@material-ui/core/Paper';
-// import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
-// import Chart from './Chart';
-// import Deposits from './Deposits';
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import GetTimetables, { mainListItems } from './GetTimetables';
+// import { Calendar, momentLocalizer } from "react-big-calendar";
+// import moment from "moment";
+// import "react-big-calendar/lib/css/react-big-calendar.css";
 
-const localizer = momentLocalizer(moment);
+// const localizer = momentLocalizer(moment);
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -108,8 +104,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+const initialMessage = (
+  <h1>
+    Create or select a timetable on the left!
+  </h1>
+);
+
+export default function Dashboard({timetables}) {
   const classes = useStyles();
+  
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -117,18 +120,13 @@ export default function Dashboard() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  
+  const [currTimetable, selectTimetable] = React.useState(initialMessage);
+  const handleSelectTimetable = (timetable) => {
+    selectTimetable(timetable);
+  }
+
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const state = {
-    events: [
-      {
-        start: moment().toDate(),
-        end: moment()
-          .add(1, "days")
-          .toDate(),
-        title: "Some title"
-      }
-    ]
-  };
 
   return (
     <div className={classes.root}>
@@ -169,19 +167,13 @@ export default function Dashboard() {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        <List>{secondaryListItems}</List>
+        <GetTimetables timetables={timetables} handleSelectTimetable={handleSelectTimetable}></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
+        {/*Use menu component for clicking on events*/}
         <Container maxWidth="lg" className={classes.container}>
-            {/* Recent Orders */}
-            <Calendar
-                localizer={localizer}
-                defaultDate={new Date()}
-                defaultView="month"
-                events={state.events}
-                style={{ height: "90vh" }}
-            />
+            {currTimetable}
         </Container>
       </main>
     </div>

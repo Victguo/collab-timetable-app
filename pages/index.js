@@ -3,7 +3,7 @@
 // import utilStyles from '../styles/utils.module.css'
 import Dashboard from '../components/Dashboard'
 
-export default function Home() {
+export default function Homepage({timetables}) {
 
   return (
     // <Layout home>
@@ -19,8 +19,7 @@ export default function Home() {
     //   </section>
     // </Layout>
     // <>
-    <Dashboard>
-
+    <Dashboard timetables = {timetables}>
     </Dashboard>
   )
 }

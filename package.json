@@ -21,6 +21,8 @@
     "react-big-calendar": "^0.33.2",
     "react-dom": "^16.13.0",
     "recharts": "^2.0.8",
+    "styled-jsx": "^3.3.2",
     "validator": "^13.5.2"
+    
   }
 }
