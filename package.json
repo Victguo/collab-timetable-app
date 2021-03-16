@@ -10,13 +10,17 @@
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
+    "bcrypt": "^5.0.1",
     "classnames": "^2.2.6",
+    "connect-mongo": "^4.4.0",
     "moment": "^2.29.1",
     "mongodb": "^3.6.4",
     "next": "^10.0.0",
+    "next-connect": "^0.10.0",
     "react": "^16.13.0",
     "react-big-calendar": "^0.33.2",
     "react-dom": "^16.13.0",
-    "recharts": "^2.0.8"
+    "recharts": "^2.0.8",
+    "validator": "^13.5.2"
   }
 }
