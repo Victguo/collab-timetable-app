@@ -32,7 +32,7 @@ export async function getServerSideProps(context) {
   .collection("movies")
   .find({})
   .sort({ metacritic: -1 })
-  .limit(30)
+  .limit(20)
   .toArray();
 
   return {

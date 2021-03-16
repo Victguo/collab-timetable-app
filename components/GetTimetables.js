@@ -1,13 +1,16 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import ClearIcon from '@material-ui/icons/Clear';
-import NewTimetableDialog from '../pages/NewTimetableDialog';
-import DeleteDialog from '../pages/DeleteDialog';
+import NewTimetableDialog from './NewTimetableDialog';
+import DeleteDialog from './DeleteDialog';
 import { makeStyles } from '@material-ui/core/styles';
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
+const localizer = momentLocalizer(moment);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,14 +45,44 @@ export const mainListItems = (
 
 export let timetables;
 
-export default function GetTimetables({timetables}) {
+export default function GetTimetables({timetables, handleSelectTimetable}) {
 
   const classes = useStyles();
   const [selectedIndex, setSelectedIndex] = React.useState(1);
 
-  const handleListItemClick = (event, index) => {
+  const getEvent = (title) => {
+    return (
+      [
+        {
+          start: moment().toDate(),
+          end: moment()
+            .add(1, "days")
+            .toDate(),
+          title: title
+        }
+      ]
+    );
+  }
+  
+  // console.log(timetables);
+
+  const handleListItemClick = (event, index, events) => {
     setSelectedIndex(index);
+    selectTimetable(events);
   };
+
+  const selectTimetable = (events) => {
+
+    handleSelectTimetable(
+      <Calendar
+        localizer={localizer}
+        defaultDate={new Date()}
+        defaultView="month"
+        events={getEvent(events)}
+        style={{ height: "80vh" }}
+      />
+    );
+  }
 
   return (
   <List className={classes.root}>
@@ -59,11 +92,13 @@ export default function GetTimetables({timetables}) {
         key={table._id} 
         button 
         selected={selectedIndex === table._id} 
-        onClick={(event) => handleListItemClick(event, table._id)}
+        onClick={(event) => handleListItemClick(event, table._id, table.title)}
       >
         <DeleteDialog></DeleteDialog>
         <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
       </ListItem>
     ))}
+    <ListSubheader disableSticky inset>Shared with you</ListSubheader>
+
   </List>);
 };

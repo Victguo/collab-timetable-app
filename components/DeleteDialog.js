@@ -44,8 +44,8 @@ export default function DeleteDialog() {
         </DialogActions>
         </Dialog>
         <Tooltip title="Delete" arrow>
-            <IconButton aria-label="delete">
-                <DeleteIcon onClick={() => handleClickOpen()}/>
+            <IconButton onClick={() => handleClickOpen()} aria-label="delete">
+                <DeleteIcon/>
             </IconButton>
         </Tooltip>
     </div>
