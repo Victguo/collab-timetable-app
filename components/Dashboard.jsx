@@ -20,6 +20,10 @@ import GetTimetables, { mainListItems } from './GetTimetables';
 // import { Calendar, momentLocalizer } from "react-big-calendar";
 // import moment from "moment";
 // import "react-big-calendar/lib/css/react-big-calendar.css";
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import DeleteEventDialog from './DeleteEventDialog';
+import NewEventDialog from './newEventDialog';
 
 // const localizer = momentLocalizer(moment);
 
@@ -113,6 +117,7 @@ const initialMessage = (
 export default function Dashboard({timetables}) {
   const classes = useStyles();
   
+  // drawer on the side
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -121,10 +126,80 @@ export default function Dashboard({timetables}) {
     setOpen(false);
   };
   
-  const [currTimetable, selectTimetable] = React.useState(initialMessage);
-  const handleSelectTimetable = (timetable) => {
-    selectTimetable(timetable);
+  // clicking on timetables
+  const [currTimetable, setTimetable] = React.useState(initialMessage);
+
+  const handleTimetableSelect = (timetable) => {
+    setTimetable(timetable);
   }
+
+  // clicking on events
+  const [selectedEvent, setSelectedEvent] = React.useState(null);
+
+  const handleSelectedEvent = (event) => {
+    setSelectedEvent(event);
+  };
+
+  // clicking on calendar
+  const [selectedSlot, setSelectedSlot] = React.useState(null);
+
+  const handleSelectedSlot = (event) => {
+    setSelectedSlot(event);
+  };
+
+  // what the user clicked on
+  const handleCloseEvent = (choice) => {
+    // if the user clicked on one of the options
+    if (choice) {
+      // open corresponding option's dialog
+      handleOpenDialog(choice);
+    } 
+
+    setSelectedEvent(null);
+    setSelectedSlot(null);
+  }
+
+  // dialogs
+  const [deleteDialog, setDeleteDialog] = React.useState(false);
+  const [editDialog, setEditDialog] = React.useState(false);
+  const [newEventDialog, setNewEventDialog] = React.useState(false);
+
+  const handleOpenDialog = (dialog) => {
+    switch (dialog){
+      // delete dialog
+      case "delete":
+        setDeleteDialog(true);
+        break;
+      case "edit":
+        setEditDialog(true);
+        break;
+      case "create event":
+        setNewEventDialog(true);
+        break;
+    }
+  };
+
+  const handleCloseDialog = (dialog, choice) => {
+    switch (dialog){
+      // delete dialog
+      case "delete":
+        setDeleteDialog(false);
+        // if the user chose to delete
+        if (choice){}
+        // delete the event
+        break;
+      
+      case "edit":
+        setEditDialog(false);
+        break;
+
+      case "create event":
+        setNewEventDialog(false);
+        break;
+
+    }
+  };
+
 
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -167,7 +242,7 @@ export default function Dashboard({timetables}) {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        <GetTimetables timetables={timetables} handleSelectTimetable={handleSelectTimetable}></GetTimetables>
+        <GetTimetables timetables={timetables} handleTimetableSelect={handleTimetableSelect} handleSelectedEvent={handleSelectedEvent} handleSelectedSlot={handleSelectedSlot} ></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -175,6 +250,28 @@ export default function Dashboard({timetables}) {
         <Container maxWidth="lg" className={classes.container}>
             {currTimetable}
         </Container>
+        <Menu
+          id="simple-menu"
+          anchorEl={selectedEvent}
+          keepMounted
+          open={Boolean(selectedEvent)}
+          onClose={() => handleCloseEvent(null)}
+        >
+          <MenuItem onClick={() => handleCloseEvent("edit")}>Edit</MenuItem>
+          <MenuItem onClick={() => handleCloseEvent("delete")}>Delete</MenuItem>
+        </Menu>
+        <Menu
+          id="simple-menu"
+          anchorEl={selectedSlot}
+          keepMounted
+          open={Boolean(selectedSlot)}
+          onClose={() => handleCloseEvent(null)}
+        >
+          <MenuItem onClick={() => handleCloseEvent("create event")}>New Event</MenuItem>
+        </Menu>
+        <DeleteEventDialog open={deleteDialog} handleCloseDialog={handleCloseDialog}></DeleteEventDialog>
+        <NewEventDialog open={newEventDialog} handleCloseDialog={handleCloseDialog}></NewEventDialog>
+
       </main>
     </div>
   );

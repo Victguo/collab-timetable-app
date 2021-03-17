@@ -10,7 +10,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 
-export default function DeleteDialog() {
+export default function DeleteDialog({type}) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -28,10 +28,10 @@ export default function DeleteDialog() {
             onClose={handleClose}         
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">{"Delete timetable?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Delete " + type + "?"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-          Are you sure you want to delete this timetable?
+          Are you sure you want to delete this {type}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

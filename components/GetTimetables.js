@@ -45,43 +45,91 @@ export const mainListItems = (
 
 export let timetables;
 
-export default function GetTimetables({timetables, handleSelectTimetable}) {
+export default function GetTimetables({timetables, handleTimetableSelect, handleSelectedEvent, handleSelectedSlot}) {
 
   const classes = useStyles();
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedTimetable, setSelectedTimetable] = React.useState(1);
 
-  const getEvent = (title) => {
-    return (
-      [
-        {
-          start: moment().toDate(),
-          end: moment()
-            .add(1, "days")
-            .toDate(),
-          title: title
-        }
-      ]
-    );
+  let test = (
+    [
+      {
+        start: moment().toDate(),
+        end: moment()
+          .add(1, "days")
+          .toDate(),
+        title: "title"
+      }
+    ]
+  );
+
+  const getEvents = (title) => {
+
+    // get the events from the database
+    return test;
   }
-  
-  // console.log(timetables);
 
-  const handleListItemClick = (event, index, events) => {
-    setSelectedIndex(index);
+  const setEvent = (start, end, title, timetable) => {
+
+    let events = getEvents(timetable);
+
+    events.push({
+      start,
+      end,
+      title
+    })
+
+    selectTimetable(events);
+
+    // push it to the database
+
+  };
+
+  const handleListItemClick = (event, timetableID, events) => {
+    setSelectedTimetable(timetableID);
     selectTimetable(events);
   };
 
+  const handleSlotSelect = (slotInfo) => {
+
+    // clicked on one day
+    if (slotInfo.box) {
+      handleSelectedSlot(document.elementFromPoint(slotInfo.box.x, slotInfo.box.y));
+    } 
+    // clicked on more than one day
+    else if (slotInfo.bounds) {
+      handleSelectedSlot(document.elementFromPoint(slotInfo.bounds.x, slotInfo.bounds.y));
+
+    }
+
+  };
+
+  const handleEventSelect = (event, e) => {
+
+    handleSelectedEvent(e.currentTarget);
+
+  }
+
+  // const handleEventClose = () => {
+  //   //setAnchorEl(null);
+  // };
+
   const selectTimetable = (events) => {
 
-    handleSelectTimetable(
-      <Calendar
-        localizer={localizer}
-        defaultDate={new Date()}
-        defaultView="month"
-        events={getEvent(events)}
-        style={{ height: "80vh" }}
-      />
-    );
+    let timetable = (
+      <div>
+        <Calendar
+          selectable
+          localizer={localizer}
+          defaultDate={new Date()}
+          defaultView="month"
+          events={getEvents(events)}
+          style={{ height: "80vh" }}
+          onSelectSlot={handleSlotSelect}
+          onSelectEvent={(event, e) => handleEventSelect(event, e)}
+        />
+      </div>
+    )
+    handleTimetableSelect(timetable);
   }
 
   return (
@@ -91,10 +139,10 @@ export default function GetTimetables({timetables, handleSelectTimetable}) {
       <ListItem 
         key={table._id} 
         button 
-        selected={selectedIndex === table._id} 
+        selected={selectedTimetable === table._id} 
         onClick={(event) => handleListItemClick(event, table._id, table.title)}
       >
-        <DeleteDialog></DeleteDialog>
+        <DeleteDialog type="timetable"></DeleteDialog>
         <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
       </ListItem>
     ))}
