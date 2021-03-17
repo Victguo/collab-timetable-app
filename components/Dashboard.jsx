@@ -23,6 +23,7 @@ import GetTimetables, { mainListItems } from './GetTimetables';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import DeleteEventDialog from './DeleteEventDialog';
+import NewEventDialog from './newEventDialog';
 
 // const localizer = momentLocalizer(moment);
 
@@ -139,31 +140,64 @@ export default function Dashboard({timetables}) {
     setSelectedEvent(event);
   };
 
-  const handleCloseEvent = (choice) => {
-    if (choice) {
-      // user chose delete
-      if (choice === "delete"){
-        // open delete dialog
-        handleOpenDialog();
-      }
-      // user chose edit
-      else {
+  // clicking on calendar
+  const [selectedSlot, setSelectedSlot] = React.useState(null);
 
-      }
+  const handleSelectedSlot = (event) => {
+    setSelectedSlot(event);
+  };
+
+  // what the user clicked on
+  const handleCloseEvent = (choice) => {
+    // if the user clicked on one of the options
+    if (choice) {
+      // open corresponding option's dialog
+      handleOpenDialog(choice);
     } 
 
     setSelectedEvent(null);
+    setSelectedSlot(null);
   }
 
-  // open dialogs
-  const [openDialog, setOpenDialog] = React.useState(false);
+  // dialogs
+  const [deleteDialog, setDeleteDialog] = React.useState(false);
+  const [editDialog, setEditDialog] = React.useState(false);
+  const [newEventDialog, setNewEventDialog] = React.useState(false);
 
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
+  const handleOpenDialog = (dialog) => {
+    switch (dialog){
+      // delete dialog
+      case "delete":
+        setDeleteDialog(true);
+        break;
+      case "edit":
+        setEditDialog(true);
+        break;
+      case "create event":
+        setNewEventDialog(true);
+        break;
+    }
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleCloseDialog = (dialog, choice) => {
+    switch (dialog){
+      // delete dialog
+      case "delete":
+        setDeleteDialog(false);
+        // if the user chose to delete
+        if (choice){}
+        // delete the event
+        break;
+      
+      case "edit":
+        setEditDialog(false);
+        break;
+
+      case "create event":
+        setNewEventDialog(false);
+        break;
+
+    }
   };
 
 
@@ -208,7 +242,7 @@ export default function Dashboard({timetables}) {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        <GetTimetables timetables={timetables} handleTimetableSelect={handleTimetableSelect} handleSelectedEvent={handleSelectedEvent} ></GetTimetables>
+        <GetTimetables timetables={timetables} handleTimetableSelect={handleTimetableSelect} handleSelectedEvent={handleSelectedEvent} handleSelectedSlot={handleSelectedSlot} ></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -226,7 +260,17 @@ export default function Dashboard({timetables}) {
           <MenuItem onClick={() => handleCloseEvent("edit")}>Edit</MenuItem>
           <MenuItem onClick={() => handleCloseEvent("delete")}>Delete</MenuItem>
         </Menu>
-        <DeleteEventDialog open={openDialog} handleClose={handleCloseDialog}></DeleteEventDialog>
+        <Menu
+          id="simple-menu"
+          anchorEl={selectedSlot}
+          keepMounted
+          open={Boolean(selectedSlot)}
+          onClose={() => handleCloseEvent(null)}
+        >
+          <MenuItem onClick={() => handleCloseEvent("create event")}>New Event</MenuItem>
+        </Menu>
+        <DeleteEventDialog open={deleteDialog} handleCloseDialog={handleCloseDialog}></DeleteEventDialog>
+        <NewEventDialog open={newEventDialog} handleCloseDialog={handleCloseDialog}></NewEventDialog>
 
       </main>
     </div>

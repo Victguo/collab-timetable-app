@@ -1,13 +1,12 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function NewEventDialog({open, handleCloseDialog}) {
+export default function EditDialog({open, handleCloseDialog}) {
 
   return (
     <div>
@@ -16,23 +15,18 @@ export default function NewEventDialog({open, handleCloseDialog}) {
             onClose={() => handleCloseDialog(null, null)}         
             aria-labelledby="form-dialog-title"
         >
-        <DialogTitle id="form-dialog-title">Create Event</DialogTitle>
+        <DialogTitle id="form-dialog-title">Edit Event</DialogTitle>
         <DialogContent>
           <DialogContentText>
-          Enter the name of your event
+          Are you sure you want to delete this event?
           </DialogContentText>
-          <TextField
-            required 
-            id="filled-required" 
-            label="Name" 
-          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleCloseDialog("create event", false)} color="primary">
+          <Button onClick={() => handleCloseDialog("delete", false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => handleCloseDialog("create event", true)} color="primary">
-            Create
+          <Button onClick={() => handleCloseDialog("delete", true)} color="primary">
+            Delete
           </Button>
         </DialogActions>
         </Dialog>

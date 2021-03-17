@@ -45,7 +45,7 @@ export const mainListItems = (
 
 export let timetables;
 
-export default function GetTimetables({timetables, handleTimetableSelect, handleSelectedEvent}) {
+export default function GetTimetables({timetables, handleTimetableSelect, handleSelectedEvent, handleSelectedSlot}) {
 
   const classes = useStyles();
   const [selectedTimetable, setSelectedTimetable] = React.useState(1);
@@ -89,9 +89,18 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
     selectTimetable(events);
   };
 
-  const handleSelect = ({ start, end }) => {
-    // const title = window.prompt('New Event name');
-    // if (title) setEvent(start, end, title, selectedTimetable)
+  const handleSlotSelect = (slotInfo) => {
+
+    // clicked on one day
+    if (slotInfo.box) {
+      handleSelectedSlot(document.elementFromPoint(slotInfo.box.x, slotInfo.box.y));
+    } 
+    // clicked on more than one day
+    else if (slotInfo.bounds) {
+      handleSelectedSlot(document.elementFromPoint(slotInfo.bounds.x, slotInfo.bounds.y));
+
+    }
+
   };
 
   const handleEventSelect = (event, e) => {
@@ -115,7 +124,7 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
           defaultView="month"
           events={getEvents(events)}
           style={{ height: "80vh" }}
-          onSelectSlot={handleSelect}
+          onSelectSlot={handleSlotSelect}
           onSelectEvent={(event, e) => handleEventSelect(event, e)}
         />
       </div>
