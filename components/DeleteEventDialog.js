@@ -5,21 +5,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
 
-export default function DeleteDialog({type}) {
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+export default function DeleteEventDialog({open, handleClose}) {
 
   return (
     <div>
@@ -28,10 +15,10 @@ export default function DeleteDialog({type}) {
             onClose={handleClose}         
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">{"Delete " + type + "?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Delete event?"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-          Are you sure you want to delete this {type}?
+          Are you sure you want to delete this event?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -43,11 +30,6 @@ export default function DeleteDialog({type}) {
           </Button>
         </DialogActions>
         </Dialog>
-        <Tooltip title="Delete" arrow>
-            <IconButton onClick={() => handleClickOpen()} aria-label="delete">
-                <DeleteIcon/>
-            </IconButton>
-        </Tooltip>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 // import Layout, { siteTitle } from '../components/layout'
 // import utilStyles from '../styles/utils.module.css'
 import Dashboard from '../components/Dashboard'
-import { connectToDatabase } from '../util/mongodb'
+import { connectToDatabase } from '../middleware/mongodb'
 
 export default function Homepage({timetables}) {
 
