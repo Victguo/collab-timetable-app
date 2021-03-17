@@ -1,12 +1,12 @@
 import nextConnect from 'next-connect';
 import isEmail from 'validator/lib/isEmail';
 import crypto from 'crypto';
-import middleware from '../../middleware/mongodb';
+import middleware from '../../middleware/index';
 
 const handler = nextConnect();
 handler.use(middleware);
 
-handler.post(async (req, res) => {
+handler.post(async (req, res, next) => {
     const {email, password} = req.body;
     if (!isEmail(email)) {
         return res.status(400).send('The email is invalid');
@@ -24,6 +24,7 @@ handler.post(async (req, res) => {
         password: hash,
         salt: salt
     }).then(({ ops }) => ops[0]);
+    req.session.username = email;
     return res.status(201).json(user);
 });
 
