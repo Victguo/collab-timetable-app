@@ -18,18 +18,6 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-  },
-}));
 
 export default function EventDialog({selectedEvent, type, open, handleCloseDialog, start, end}) {
 
@@ -48,8 +36,8 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
     setEndDate(end);
   }
 
-  // if the user is editing an existing event
-  if (type == "edit"){
+  // if the user is editing an existing event and opened the dialog
+  if (type == "edit" && open){
     if (!startDate && selectedEvent.start){
       setStartDate(selectedEvent.start);
     }
@@ -92,24 +80,20 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
         setInvalidName(false);
       }
       else {
-        handleCloseDialog("create event", true, {eventName: eventName, eventDescription: eventDescription, startDate: startDate, endDate: endDate});
-  
-        setEventName("");
-        setEventDescription("");
-        setInvalidName(false);
-        setInvalidDate(false);
+        handleCloseDialog(type, true, {eventName: eventName, eventDescription: eventDescription, startDate: startDate, endDate: endDate});
+
       }
     }
     // user chose to cancel
     else {
-      handleCloseDialog("create event", false, null)
-      setEventName("");
-      setEventDescription("");
-      setInvalidName(false);
-      setInvalidDate(false);
-      setStartDate(null);
-      setEndDate(null);
+      handleCloseDialog(type, false, null)
     }
+    setEventName("");
+    setEventDescription("");
+    setStartDate(null);
+    setEndDate(null);
+    setInvalidName(false);
+    setInvalidDate(false);
   }
 
   return (
