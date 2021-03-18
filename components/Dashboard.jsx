@@ -134,22 +134,29 @@ export default function Dashboard({timetables}) {
   }
 
   // clicking on events
-  const [selectedEvent, setSelectedEvent] = React.useState(null);
+  const [selectedEvent, setSelectedEvent] = React.useState({x: 0, y: 0, open: false});
 
-  const handleSelectedEvent = (event) => {
-    setSelectedEvent(event);
+  const handleSelectedEvent = (x, y) => {
+    setSelectedEvent({
+      x: x,
+      y: y,
+      open: true
+    });
   };
 
   // clicking on calendar
-  const [selectedSlot, setSelectedSlot] = React.useState(null);
+  const [selectedSlot, setSelectedSlot] = React.useState({x: 0, y: 0, open: false});
   const [start, setStart] = React.useState(null);
   const [end, setEnd] = React.useState(null);
 
-  const handleSelectedSlot = (event, start, end) => {
+  const handleSelectedSlot = (mouseX, mouseY, start, end) => {
     setStart(start);
     setEnd(end);
-    setSelectedSlot(event);
-    console.log(start);
+    setSelectedSlot({
+      x: mouseX,
+      y: mouseY,
+      open: true,
+    });
   };
 
   // what the user clicked on
@@ -160,8 +167,16 @@ export default function Dashboard({timetables}) {
       handleOpenDialog(choice);
     } 
 
-    setSelectedEvent(null);
-    setSelectedSlot(null);
+    setSelectedEvent({
+      x: 0,
+      y: 0,
+      open: false,
+    });
+    setSelectedSlot({      
+      x: 0,
+      y: 0,
+      open: false,
+    });
     setStart(null);
     setEnd(null);
   }
@@ -268,9 +283,10 @@ export default function Dashboard({timetables}) {
         </Container>
         <Menu
           id="simple-menu"
-          anchorEl={selectedEvent}
+          anchorPosition={{left: selectedEvent.x, top: selectedEvent.y}}
+          anchorReference="anchorPosition"
           keepMounted
-          open={Boolean(selectedEvent)}
+          open={selectedEvent.open}
           onClose={() => handleCloseEvent(null)}
         >
           <MenuItem onClick={() => handleCloseEvent("edit")}>Edit</MenuItem>
@@ -278,9 +294,10 @@ export default function Dashboard({timetables}) {
         </Menu>
         <Menu
           id="simple-menu"
-          anchorEl={selectedSlot}
+          anchorPosition={{left: selectedSlot.x, top: selectedSlot.y}}
+          anchorReference="anchorPosition"
           keepMounted
-          open={Boolean(selectedSlot)}
+          open={selectedSlot.open}
           onClose={() => handleCloseEvent(null)}
         >
           <MenuItem onClick={() => handleCloseEvent("create event")}>New Event</MenuItem>
