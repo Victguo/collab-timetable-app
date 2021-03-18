@@ -4,14 +4,12 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import emailjs from 'emailjs-com';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,6 +55,13 @@ export default function SignUpPage() {
     });
     if (res.status === 200) {
       const userObj = await res.json();
+      emailjs.send('service_dfykjcc', 'template_sdlqg2a', {
+        to_email: userObj.email,
+      }).then((result) => {
+          console.log(result.text);
+      }, (error) => {
+          console.log(error.text);
+      });
       Router.replace('/');
       // writing our user object to the state
       // console.log(userObj);

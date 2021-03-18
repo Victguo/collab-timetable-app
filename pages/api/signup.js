@@ -3,6 +3,7 @@ import isEmail from 'validator/lib/isEmail';
 import crypto from 'crypto';
 import middleware from '../../middleware/index';
 import cookie from 'cookie';
+
 const handler = nextConnect();
 handler.use(middleware);
 
