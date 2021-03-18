@@ -93,11 +93,11 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
 
     // clicked on one day
     if (slotInfo.box) {
-      handleSelectedSlot(document.elementFromPoint(slotInfo.box.x, slotInfo.box.y));
+      handleSelectedSlot(document.elementFromPoint(slotInfo.box.x, slotInfo.box.y), slotInfo.start, slotInfo.end);
     } 
     // clicked on more than one day
     else if (slotInfo.bounds) {
-      handleSelectedSlot(document.elementFromPoint(slotInfo.bounds.x, slotInfo.bounds.y));
+      handleSelectedSlot(document.elementFromPoint(slotInfo.bounds.x, slotInfo.bounds.y), slotInfo.start, slotInfo.end);
 
     }
 

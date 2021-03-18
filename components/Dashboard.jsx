@@ -142,9 +142,14 @@ export default function Dashboard({timetables}) {
 
   // clicking on calendar
   const [selectedSlot, setSelectedSlot] = React.useState(null);
+  const [start, setStart] = React.useState(null);
+  const [end, setEnd] = React.useState(null);
 
-  const handleSelectedSlot = (event) => {
+  const handleSelectedSlot = (event, start, end) => {
+    setStart(start);
+    setEnd(end);
     setSelectedSlot(event);
+    console.log(start);
   };
 
   // what the user clicked on
@@ -157,6 +162,8 @@ export default function Dashboard({timetables}) {
 
     setSelectedEvent(null);
     setSelectedSlot(null);
+    setStart(null);
+    setEnd(null);
   }
 
   // dialogs
@@ -185,16 +192,25 @@ export default function Dashboard({timetables}) {
       case "delete":
         setDeleteDialog(false);
         // if the user chose to delete
-        if (choice){}
+        if (choice){
+          // call api to delete the event
+        }
         // delete the event
         break;
       
       case "edit":
         setEditDialog(false);
+        // if the user chose to make edits
+        if (choice){
+          // call api to edit the event
+        }
         break;
 
       case "create event":
         setNewEventDialog(false);
+        if (choice) {
+          // call api to create the event
+        }
         break;
 
     }
@@ -270,7 +286,7 @@ export default function Dashboard({timetables}) {
           <MenuItem onClick={() => handleCloseEvent("create event")}>New Event</MenuItem>
         </Menu>
         <DeleteEventDialog open={deleteDialog} handleCloseDialog={handleCloseDialog}></DeleteEventDialog>
-        <NewEventDialog open={newEventDialog} handleCloseDialog={handleCloseDialog}></NewEventDialog>
+        <NewEventDialog open={newEventDialog} handleCloseDialog={handleCloseDialog} start={start} end={end}></NewEventDialog>
 
       </main>
     </div>

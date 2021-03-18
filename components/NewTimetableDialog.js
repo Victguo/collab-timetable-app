@@ -37,11 +37,11 @@ export default function NewTimetableDialog() {
             Enter the name for your new Timetable
           </DialogContentText>
           <TextField
+            required
             autoFocus
             margin="dense"
-            id="name"
+            id="filled-required"
             label="Name"
-            type="email"
             fullWidth
           />
         </DialogContent>
