@@ -2,7 +2,7 @@ import nextConnect from 'next-connect';
 import isEmail from 'validator/lib/isEmail';
 import crypto from 'crypto';
 import middleware from '../../middleware/index';
-
+import cookie from 'cookie';
 const handler = nextConnect();
 handler.use(middleware);
 
@@ -24,8 +24,13 @@ handler.post(async (req, res, next) => {
         password: hash,
         salt: salt
     }).then(({ ops }) => ops[0]);
-    req.session.username = email;
-    return res.status(201).json(user);
+    req.session.user = {email : user.email};
+
+    res.setHeader('Set-Cookie', cookie.serialize('username', user.email, {
+        path : '/', 
+        maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+    }));
+    return res.json({email : user.email});
 });
 
 function generateSalt (){
