@@ -1,12 +1,13 @@
 import nextConnect from 'next-connect';
 import isEmail from 'validator/lib/isEmail';
 import crypto from 'crypto';
-import middleware from '../../middleware/mongodb';
+import middleware from '../../middleware/index';
+import cookie from 'cookie';
 
 const handler = nextConnect();
 handler.use(middleware);
 
-handler.post(async (req, res) => {
+handler.post(async (req, res, next) => {
     const {email, password} = req.body;
     if (!isEmail(email)) {
         return res.status(400).send('The email is invalid');
@@ -24,7 +25,13 @@ handler.post(async (req, res) => {
         password: hash,
         salt: salt
     }).then(({ ops }) => ops[0]);
-    return res.status(201).json(user);
+    req.session.user = {email : user.email};
+
+    res.setHeader('Set-Cookie', cookie.serialize('username', user.email, {
+        path : '/', 
+        maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+    }));
+    return res.json({email : user.email});
 });
 
 function generateSalt (){
