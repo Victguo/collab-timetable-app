@@ -1,3 +1,5 @@
+// TODO: add description field to the event object
+
 import React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -45,6 +47,24 @@ export const mainListItems = (
 
 export let timetables;
 
+function Event({ event }) {
+  return (
+    <span>
+      <em>{event.title}</em>
+      {event.description && ':  ' + event.description}
+    </span>
+  )
+}
+
+function EventAgenda({ event }) {
+  return (
+    <span>
+      <em style={{ color: 'magenta' }}>{event.title}</em>
+      <p>{event.description}</p>
+    </span>
+  )
+}
+
 export default function GetTimetables({timetables, handleTimetableSelect, handleSelectedEvent, handleSelectedSlot}) {
 
   const classes = useStyles();
@@ -57,32 +77,34 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
         end: moment()
           .add(1, "days")
           .toDate(),
-        title: "title"
+        title: "title",
+        description: "yes"
       }
     ]
   );
 
+  // replace this later when we read in events from db
   const getEvents = (title) => {
 
     // get the events from the database
     return test;
   }
 
-  const setEvent = (start, end, title, timetable) => {
+  // const setEvent = (start, end, title, timetable) => {
 
-    let events = getEvents(timetable);
+  //   let events = getEvents(timetable);
 
-    events.push({
-      start,
-      end,
-      title
-    })
+  //   events.push({
+  //     start,
+  //     end,
+  //     title
+  //   })
 
-    selectTimetable(events);
+  //   selectTimetable(events);
 
-    // push it to the database
+  //   // push it to the database
 
-  };
+  // };
 
   const handleListItemClick = (event, timetableID, events) => {
     setSelectedTimetable(timetableID);
@@ -104,7 +126,7 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
 
   const handleEventSelect = (event, e) => {
 
-    handleSelectedEvent(e.pageX, e.pageY);
+    handleSelectedEvent(e.pageX, e.pageY, event.start, event.end, event.title, event.description);
 
   }
 
@@ -125,6 +147,12 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
           style={{ height: "80vh" }}
           onSelectSlot={handleSlotSelect}
           onSelectEvent={(event, e) => handleEventSelect(event, e)}
+          components={{
+            event: Event,
+            agenda: {
+              event: EventAgenda,
+            },
+          }}
         />
       </div>
     )

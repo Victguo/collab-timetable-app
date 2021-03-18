@@ -31,21 +31,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function NewEventDialog({open, handleCloseDialog, start, end}) {
+export default function EventDialog({selectedEvent, type, open, handleCloseDialog, start, end}) {
 
-  const [eventName, setEventName] = React.useState("");
-  const [eventDescription, setEventDescription] = React.useState("");
+  const [eventName, setEventName] = React.useState(null);
+  const [eventDescription, setEventDescription] = React.useState(null);
   const [startDate, setStartDate] = React.useState(start);
   const [endDate, setEndDate] = React.useState(end);
   const [invalidName, setInvalidName] = React.useState(false);
   const [invalidDate, setInvalidDate] = React.useState(false);
 
   // set start and end dates based on user selection
-  if (!startDate && start != startDate){
+  if (!startDate && start){
     setStartDate(start);
   }
-  if (!endDate && end != endDate){
+  if (!endDate && end){
     setEndDate(end);
+  }
+
+  // if the user is editing an existing event
+  if (type == "edit"){
+    if (!startDate && selectedEvent.start){
+      setStartDate(selectedEvent.start);
+    }
+    if (!endDate && selectedEvent.end){
+      setEndDate(selectedEvent.end);
+    }
+    if (!eventName && selectedEvent.title){
+      setEventName(selectedEvent.title);
+    }
+    if (!eventDescription && selectedEvent.description){
+      setEventDescription(selectedEvent.description);
+    }
   }
 
   const handleEventNameChange = (name) => {
@@ -66,7 +82,7 @@ export default function NewEventDialog({open, handleCloseDialog, start, end}) {
 
   const validateInput = (submit) => {
 
-    // if the user chose to create
+    // if the user chose to submit
     if (submit){
       if (!eventName) {
         setInvalidName(true);
@@ -76,7 +92,7 @@ export default function NewEventDialog({open, handleCloseDialog, start, end}) {
         setInvalidName(false);
       }
       else {
-        handleCloseDialog("create event", true);
+        handleCloseDialog("create event", true, {eventName: eventName, eventDescription: eventDescription, startDate: startDate, endDate: endDate});
   
         setEventName("");
         setEventDescription("");
@@ -86,7 +102,7 @@ export default function NewEventDialog({open, handleCloseDialog, start, end}) {
     }
     // user chose to cancel
     else {
-      handleCloseDialog("create event", false)
+      handleCloseDialog("create event", false, null)
       setEventName("");
       setEventDescription("");
       setInvalidName(false);
@@ -100,10 +116,10 @@ export default function NewEventDialog({open, handleCloseDialog, start, end}) {
     <div>
         <Dialog 
             open={open} 
-            onClose={() => handleCloseDialog(null, null)}         
+            onClose={() => handleCloseDialog(null, null, null)}         
             aria-labelledby="form-dialog-title"
         >
-        <DialogTitle id="form-dialog-title">Create Event</DialogTitle>
+        <DialogTitle id="form-dialog-title">{(type == "edit") ? "Edit": "Create"} Event</DialogTitle>
         <DialogContent>
           <TextField
             required 
@@ -197,7 +213,7 @@ export default function NewEventDialog({open, handleCloseDialog, start, end}) {
             Cancel
           </Button>
           <Button onClick={() => validateInput(true)} color="primary">
-            Create
+            {(type == "edit") ? "Confirm": "Create"}
           </Button>
         </DialogActions>
         </Dialog>

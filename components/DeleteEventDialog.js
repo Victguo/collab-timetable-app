@@ -12,7 +12,7 @@ export default function DeleteEventDialog({open, handleCloseDialog}) {
     <div>
         <Dialog 
             open={open} 
-            onClose={() => handleCloseDialog(null, null)}         
+            onClose={() => handleCloseDialog(null, null, null)}         
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">{"Delete event?"}</DialogTitle>
@@ -22,10 +22,10 @@ export default function DeleteEventDialog({open, handleCloseDialog}) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleCloseDialog("delete", false)} color="primary">
+          <Button onClick={() => handleCloseDialog("delete", false, null)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => handleCloseDialog("delete", true)} color="primary">
+          <Button onClick={() => handleCloseDialog("delete", true, null)} color="primary">
             Delete
           </Button>
         </DialogActions>
