@@ -24,3 +24,21 @@ export default function Homepage({timetables}) {
     </Dashboard>
   )
 }
+
+export async function getServerSideProps(context) {
+  const { db } = await connectToDatabase();
+
+  const movies = await db
+  .collection("movies")
+  .find({})
+  .sort({ metacritic: -1 })
+  .limit(20)
+  .toArray();
+
+  return {
+    props: {
+      timetables: JSON.parse(JSON.stringify(movies)),
+    },
+  };
+
+}
