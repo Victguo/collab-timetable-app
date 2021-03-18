@@ -12,22 +12,22 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-// import Grid from '@material-ui/core/Grid';
-// import Paper from '@material-ui/core/Paper';
-// import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
-// import Chart from './Chart';
-// import Deposits from './Deposits';
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import GetTimetables, { mainListItems } from './GetTimetables';
+// import { Calendar, momentLocalizer } from "react-big-calendar";
+// import moment from "moment";
+// import "react-big-calendar/lib/css/react-big-calendar.css";
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import DeleteEventDialog from './DeleteEventDialog';
+import NewEventDialog from './newEventDialog';
 
-const localizer = momentLocalizer(moment);
+// const localizer = momentLocalizer(moment);
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -108,8 +108,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+const initialMessage = (
+  <h1>
+    Create or select a timetable on the left!
+  </h1>
+);
+
+export default function Dashboard({timetables}) {
   const classes = useStyles();
+  
+  // drawer on the side
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -117,18 +125,83 @@ export default function Dashboard() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const state = {
-    events: [
-      {
-        start: moment().toDate(),
-        end: moment()
-          .add(1, "days")
-          .toDate(),
-        title: "Some title"
-      }
-    ]
+  
+  // clicking on timetables
+  const [currTimetable, setTimetable] = React.useState(initialMessage);
+
+  const handleTimetableSelect = (timetable) => {
+    setTimetable(timetable);
+  }
+
+  // clicking on events
+  const [selectedEvent, setSelectedEvent] = React.useState(null);
+
+  const handleSelectedEvent = (event) => {
+    setSelectedEvent(event);
   };
+
+  // clicking on calendar
+  const [selectedSlot, setSelectedSlot] = React.useState(null);
+
+  const handleSelectedSlot = (event) => {
+    setSelectedSlot(event);
+  };
+
+  // what the user clicked on
+  const handleCloseEvent = (choice) => {
+    // if the user clicked on one of the options
+    if (choice) {
+      // open corresponding option's dialog
+      handleOpenDialog(choice);
+    } 
+
+    setSelectedEvent(null);
+    setSelectedSlot(null);
+  }
+
+  // dialogs
+  const [deleteDialog, setDeleteDialog] = React.useState(false);
+  const [editDialog, setEditDialog] = React.useState(false);
+  const [newEventDialog, setNewEventDialog] = React.useState(false);
+
+  const handleOpenDialog = (dialog) => {
+    switch (dialog){
+      // delete dialog
+      case "delete":
+        setDeleteDialog(true);
+        break;
+      case "edit":
+        setEditDialog(true);
+        break;
+      case "create event":
+        setNewEventDialog(true);
+        break;
+    }
+  };
+
+  const handleCloseDialog = (dialog, choice) => {
+    switch (dialog){
+      // delete dialog
+      case "delete":
+        setDeleteDialog(false);
+        // if the user chose to delete
+        if (choice){}
+        // delete the event
+        break;
+      
+      case "edit":
+        setEditDialog(false);
+        break;
+
+      case "create event":
+        setNewEventDialog(false);
+        break;
+
+    }
+  };
+
+
+  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <div className={classes.root}>
@@ -169,20 +242,36 @@ export default function Dashboard() {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        <List>{secondaryListItems}</List>
+        <GetTimetables timetables={timetables} handleTimetableSelect={handleTimetableSelect} handleSelectedEvent={handleSelectedEvent} handleSelectedSlot={handleSelectedSlot} ></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
+        {/*Use menu component for clicking on events*/}
         <Container maxWidth="lg" className={classes.container}>
-            {/* Recent Orders */}
-            <Calendar
-                localizer={localizer}
-                defaultDate={new Date()}
-                defaultView="month"
-                events={state.events}
-                style={{ height: "90vh" }}
-            />
+            {currTimetable}
         </Container>
+        <Menu
+          id="simple-menu"
+          anchorEl={selectedEvent}
+          keepMounted
+          open={Boolean(selectedEvent)}
+          onClose={() => handleCloseEvent(null)}
+        >
+          <MenuItem onClick={() => handleCloseEvent("edit")}>Edit</MenuItem>
+          <MenuItem onClick={() => handleCloseEvent("delete")}>Delete</MenuItem>
+        </Menu>
+        <Menu
+          id="simple-menu"
+          anchorEl={selectedSlot}
+          keepMounted
+          open={Boolean(selectedSlot)}
+          onClose={() => handleCloseEvent(null)}
+        >
+          <MenuItem onClick={() => handleCloseEvent("create event")}>New Event</MenuItem>
+        </Menu>
+        <DeleteEventDialog open={deleteDialog} handleCloseDialog={handleCloseDialog}></DeleteEventDialog>
+        <NewEventDialog open={newEventDialog} handleCloseDialog={handleCloseDialog}></NewEventDialog>
+
       </main>
     </div>
   );
