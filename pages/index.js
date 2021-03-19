@@ -4,7 +4,7 @@
 import Dashboard from '../components/Dashboard'
 import { connectToDatabase } from '../middleware/mongodb'
 
-export default function Homepage({timetables}) {
+export default function Homepage({timetables, user}) {
 
   return (
     // <Layout home>
@@ -20,7 +20,7 @@ export default function Homepage({timetables}) {
     //   </section>
     // </Layout>
     // <>
-    <Dashboard timetables = {timetables}>
+    <Dashboard timetables = {timetables, user}>
     </Dashboard>
   )
 }
@@ -35,9 +35,19 @@ export async function getServerSideProps(context) {
   .limit(20)
   .toArray();
 
+  // const res = await fetch('http://localhost:3000/api/user', {
+  //   method: 'GET'
+  // });
+  // let user;
+  // if (res.status === 200) {
+  //   user = await res.json()
+  // } else {
+  //   console.log(await res.text());
+  // }
   return {
     props: {
-      timetables: JSON.parse(JSON.stringify(movies)),
+      timetables: movies,
+      // user: user
     },
   };
 

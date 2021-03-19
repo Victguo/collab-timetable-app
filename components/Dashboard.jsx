@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
@@ -114,7 +115,7 @@ const initialMessage = (
   </h1>
 );
 
-export default function Dashboard({timetables}) {
+export default function Dashboard({timetables, user}) {
   const classes = useStyles();
   
   // drawer on the side
@@ -189,6 +190,10 @@ export default function Dashboard({timetables}) {
     });
     setStart(null);
     setEnd(null);
+  }
+
+  const handleLogout = () => {
+    
   }
 
   // dialogs
@@ -268,6 +273,22 @@ export default function Dashboard({timetables}) {
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             Dashboard
           </Typography>
+          {/* {!user ? (
+            <>
+            <Link href="/login" color="inherit">
+              Sign In
+            </Link>
+            <Link href="/signup" color="inherit">
+              Sign Up
+            </Link>
+            </>
+          ) : (
+            <>
+              <a tabIndex={0} role="button" onClick={handleLogout}>
+              Logout
+              </a>
+            </>
+          )}           */}
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
