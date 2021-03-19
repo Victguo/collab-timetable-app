@@ -13,14 +13,35 @@ import AddIcon from '@material-ui/icons/Add';
 
 export default function NewTimetableDialog() {
   const [open, setOpen] = React.useState(false);
+  const [title, setTitle] = React.useState("");
+
+  const handleTitleChange = (title) => {
+    setTitle(title.target.value);
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (submit) => {
     setOpen(false);
+    setTitle("");
+    if (submit) {
+      insertTimetable();
+    }
   };
+
+  const insertTimetable = async() => {
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: title,
+        owner: "test"
+      }),
+    });
+    console.log(res);
+  }
 
   return (
     <div>
@@ -30,7 +51,7 @@ export default function NewTimetableDialog() {
         </ListItemIcon>
         <ListItemText primary="Create Timetable" />
       </ListItem>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+      <Dialog open={open} onClose={() => handleClose(false)} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">New Timetable</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -43,13 +64,15 @@ export default function NewTimetableDialog() {
             id="filled-required"
             label="Name"
             fullWidth
+            onChange={handleTitleChange}
+            value={title}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() => handleClose(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() => handleClose(true)} color="primary">
             Create
           </Button>
         </DialogActions>
