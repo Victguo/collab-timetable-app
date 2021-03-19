@@ -28,16 +28,17 @@ export default function Homepage({timetables}) {
 export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
 
-  const movies = await db
-  .collection("movies")
-  .find({})
-  .sort({ metacritic: -1 })
-  .limit(20)
-  .toArray();
+  const res = await fetch('http://localhost:3000/api/timetables', {
+    method: 'GET',
+  });
+  let timetable = [];
+  if (res.status === 200) {
+    timetable = await res.json();
+  }
 
   return {
     props: {
-      timetables: JSON.parse(JSON.stringify(movies)),
+      timetables: timetable,
     },
   };
 

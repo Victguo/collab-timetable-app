@@ -6,7 +6,6 @@ const handler = nextConnect();
 handler.use(middleware);
 
 handler.post(async (req, res, next) => {
-    console.log("test");
     const title = req.body.title;
     const owner = req.body.owner;
     if (!title) {

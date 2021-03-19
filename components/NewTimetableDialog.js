@@ -32,7 +32,7 @@ export default function NewTimetableDialog() {
   };
 
   const insertTimetable = async() => {
-    const res = await fetch('/api/signup', {
+    const res = await fetch('/api/timetables', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -40,7 +40,13 @@ export default function NewTimetableDialog() {
         owner: "test"
       }),
     });
-    console.log(res);
+    if (res.status === 200) {
+      const timetable = await res.json();
+      // update the timetable
+
+    } else {
+      // some kinda error?
+    }
   }
 
   return (

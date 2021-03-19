@@ -16,14 +16,14 @@ import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import GetTimetables, { mainListItems } from './GetTimetables';
+import GetTimetables, { mainListItems } from '../components/GetTimetables';
 // import { Calendar, momentLocalizer } from "react-big-calendar";
 // import moment from "moment";
 // import "react-big-calendar/lib/css/react-big-calendar.css";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import DeleteEventDialog from './DeleteEventDialog';
-import EventDialog from './EventDialog';
+import DeleteEventDialog from '../components/DeleteEventDialog';
+import EventDialog from '../components/EventDialog';
 
 // const localizer = momentLocalizer(moment);
 
@@ -115,6 +115,7 @@ const initialMessage = (
 );
 
 export default function Dashboard({timetables}) {
+
   const classes = useStyles();
   
   // drawer on the side

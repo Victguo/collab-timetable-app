@@ -45,8 +45,6 @@ export const mainListItems = (
   </div>
 );
 
-export let timetables;
-
 function Event({ event }) {
   return (
     <span>
