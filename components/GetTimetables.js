@@ -5,14 +5,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import NewTimetableDialog from './NewTimetableDialog';
 import DeleteDialog from './DeleteDialog';
 import { makeStyles } from '@material-ui/core/styles';
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-
-const localizer = momentLocalizer(moment);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,131 +26,16 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export const mainListItems = (
-  <div>
-    {/* <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Create new Timetable" onClick={} />
-    </ListItem> */}
-    <NewTimetableDialog>
-      
-    </NewTimetableDialog>
-  </div>
-);
 
-function Event({ event }) {
-  return (
-    <span>
-      <em>{event.title}</em>
-      {event.description && ':  ' + event.description}
-    </span>
-  )
-}
-
-function EventAgenda({ event }) {
-  return (
-    <span>
-      <em style={{ color: 'magenta' }}>{event.title}</em>
-      <p>{event.description}</p>
-    </span>
-  )
-}
-
-export default function GetTimetables({timetables, handleTimetableSelect, handleSelectedEvent, handleSelectedSlot}) {
+export default function GetTimetables({currTimetable, timetables, handleTimetableSelect, refreshData}) {
 
   const classes = useStyles();
-  const [selectedTimetable, setSelectedTimetable] = React.useState(1);
-
-  let test = (
-    [
-      {
-        start: moment().toDate(),
-        end: moment()
-          .add(1, "days")
-          .toDate(),
-        title: "title",
-        description: "yes"
-      }
-    ]
-  );
-
-  // replace this later when we read in events from db
-  const getEvents = (title) => {
-
-    // get the events from the database
-    return test;
-  }
-
-  // const setEvent = (start, end, title, timetable) => {
-
-  //   let events = getEvents(timetable);
-
-  //   events.push({
-  //     start,
-  //     end,
-  //     title
-  //   })
-
-  //   selectTimetable(events);
-
-  //   // push it to the database
-
-  // };
 
   const handleListItemClick = (event, timetableID, events) => {
-    setSelectedTimetable(timetableID);
-    selectTimetable(events);
-  };
-
-  const handleSlotSelect = (slotInfo) => {
-
-    // clicked on one day
-    if (slotInfo.box) {
-      handleSelectedSlot(slotInfo.box.x, slotInfo.box.y, slotInfo.start, slotInfo.end);
-    } 
-    // clicked on more than one day
-    else if (slotInfo.bounds) {
-      handleSelectedSlot(slotInfo.bounds.x, slotInfo.bounds.y, slotInfo.start, slotInfo.end);
-    }
+    
+    handleTimetableSelect(timetableID, events);
 
   };
-
-  const handleEventSelect = (event, e) => {
-
-    handleSelectedEvent(e.pageX, e.pageY, event.start, event.end, event.title, event.description);
-
-  }
-
-  // const handleEventClose = () => {
-  //   //setAnchorEl(null);
-  // };
-
-  const selectTimetable = (events) => {
-
-    let timetable = (
-      <div>
-        <Calendar
-          selectable
-          localizer={localizer}
-          defaultDate={new Date()}
-          defaultView="month"
-          events={getEvents(events)}
-          style={{ height: "80vh" }}
-          onSelectSlot={handleSlotSelect}
-          onSelectEvent={(event, e) => handleEventSelect(event, e)}
-          components={{
-            event: Event,
-            agenda: {
-              event: EventAgenda,
-            },
-          }}
-        />
-      </div>
-    )
-    handleTimetableSelect(timetable);
-  }
 
   return (
   <List className={classes.root}>
@@ -164,10 +44,10 @@ export default function GetTimetables({timetables, handleTimetableSelect, handle
       <ListItem 
         key={table._id} 
         button 
-        selected={selectedTimetable === table._id} 
-        onClick={(event) => handleListItemClick(event, table._id, table.title)}
+        selected={currTimetable === table._id} 
+        onClick={(event) => handleListItemClick(event, table._id, table.events)}
       >
-        <DeleteDialog type="timetable"></DeleteDialog>
+        <DeleteDialog type="timetable" tableID={table._id} refreshData={refreshData}></DeleteDialog>
         <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
       </ListItem>
     ))}

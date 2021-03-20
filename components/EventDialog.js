@@ -72,6 +72,7 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
 
     // if the user chose to submit
     if (submit){
+
       if (!eventName) {
         setInvalidName(true);
       }
@@ -81,7 +82,6 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
       }
       else {
         handleCloseDialog(type, true, {eventName: eventName, eventDescription: eventDescription, startDate: startDate, endDate: endDate});
-
       }
     }
     // user chose to cancel

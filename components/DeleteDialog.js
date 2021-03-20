@@ -10,22 +10,45 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 
-export default function DeleteDialog({type}) {
+export default function DeleteDialog({type, tableID, refreshData}) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (submit) => {
     setOpen(false);
+    // if the user chose to delete the timetable
+    if (submit){
+      deleteTimetable();
+    }
   };
+
+  const deleteTimetable = async() => {
+    const res = await fetch('/api/timetables', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tableID: tableID,
+      }),
+    });
+    if (res.status === 200) {
+
+      refreshData();
+
+    } else {
+      // some kinda error?
+
+      // make an alert saying something went wrong
+    }
+  }
 
   return (
     <div>
         <Dialog 
             open={open} 
-            onClose={handleClose}         
+            onClose={() => handleClose(false)}         
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">{"Delete " + type + "?"}</DialogTitle>
@@ -35,10 +58,10 @@ export default function DeleteDialog({type}) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() => handleClose(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() => handleClose(true)} color="primary">
             Delete
           </Button>
         </DialogActions>

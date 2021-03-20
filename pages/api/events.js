@@ -7,30 +7,36 @@ const handler = nextConnect();
 handler.use(middleware);
 
 handler.post(async (req, res, next) => {
+    const tableID = req.body.tableID;
     const title = req.body.title;
-    const owner = req.body.owner;
+    const start = req.body.start;
+    const end = req.body.end;
+    const description = req.body.description;
+
     if (!title) {
-        return res.status(400).send("Please enter a title for the timetable");
+        return res.status(400).send("Please enter an event title");
+    }
+    if (!tableID) {
+        return res.status(400).send("Please select a timetable for this event");
+    }
+    if (!start || !end) {
+        return res.status(400).send("Please enter a date");
     }
 
     // check to see if user is signed in
 
-    let timetable = {
+    let event = {
         title: title,
-        // change to user after
-        owner: owner,
-        events: []
+        tableID: tableID,
+        start: start,
+        end: end,
+        description: description
     }
-    const result = await req.db.collection('timetables').insertOne(timetable).then(({ ops }) => ops[0]);
+    
+    const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$push: {events: event}});
 
     return res.json({result});
 });
-
-handler.get(async (req, res) => {
-    const timetables = await req.db.collection('timetables').find({}).sort({_id: -1}).toArray();
-
-    res.send(timetables);
-})
 
 handler.delete(async (req, res) => {
     

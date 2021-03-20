@@ -16,16 +16,17 @@ import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import GetTimetables, { mainListItems } from '../components/GetTimetables';
-// import { Calendar, momentLocalizer } from "react-big-calendar";
-// import moment from "moment";
-// import "react-big-calendar/lib/css/react-big-calendar.css";
+import GetTimetables from '../components/GetTimetables';
+import NewTimetableDialog from './NewTimetableDialog';
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import DeleteEventDialog from '../components/DeleteEventDialog';
 import EventDialog from '../components/EventDialog';
 
-// const localizer = momentLocalizer(moment);
+const localizer = momentLocalizer(moment);
 
 const drawerWidth = 300;
 
@@ -114,7 +115,25 @@ const initialMessage = (
   </h1>
 );
 
-export default function Dashboard({timetables}) {
+function Event({ event }) {
+  return (
+    <span>
+      <em>{event.title}</em>
+      {event.description && ':  ' + event.description}
+    </span>
+  )
+}
+
+function EventAgenda({ event }) {
+  return (
+    <span>
+      <em style={{ color: 'magenta' }}>{event.title}</em>
+      <p>{event.description}</p>
+    </span>
+  )
+}
+
+export default function Dashboard({timetables, refreshData}) {
 
   const classes = useStyles();
   
@@ -128,14 +147,23 @@ export default function Dashboard({timetables}) {
   };
   
   // clicking on timetables
-  const [currTimetable, setTimetable] = React.useState(initialMessage);
+  const [currTimetable, setTimetable] = React.useState(null);
+  const [currTimetableEvents, setCurrTimetableEvents] = React.useState([]);
 
-  const handleTimetableSelect = (timetable) => {
-    setTimetable(timetable);
+  const handleTimetableSelect = (timetableID, events) => {
+
+    setTimetable(timetableID);
+    setCurrTimetableEvents(events);
   }
 
   // clicking on events
   const [selectedEvent, setSelectedEvent] = React.useState({x: 0, y: 0, open: false, start: null, end: null, name: null, description: null});
+
+  const handleEventSelect = (event, e) => {
+
+    handleSelectedEvent(e.pageX, e.pageY, event.start, event.end, event.title, event.description);
+
+  }
 
   const handleSelectedEvent = (x, y, start, end, title, description) => {
     setSelectedEvent({
@@ -148,6 +176,41 @@ export default function Dashboard({timetables}) {
       description: description
     });
   };
+
+  const createEvent = async(inputs) => {
+    const res = await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tableID: currTimetable,
+        title: inputs.eventName,
+        start: inputs.startDate,
+        end: inputs.endDate,
+        description: inputs.eventDescription
+      }),
+    });
+    if (res.status === 200) {
+
+      // refreshData();
+      refreshEvents();
+
+    } else {
+      // some kinda error?
+
+      // make an alert saying something went wrong
+    }
+  }
+
+  const refreshEvents = async() => {
+    const res = await fetch('/api/events/' + currTimetable, {
+      method: 'GET',
+    });
+    if (res.status === 200) {
+
+      let returnedEvents = await res.json();
+      setCurrTimetableEvents(returnedEvents);
+    }
+  }
 
   // clicking on calendar
   const [selectedSlot, setSelectedSlot] = React.useState({x: 0, y: 0, open: false});
@@ -162,6 +225,18 @@ export default function Dashboard({timetables}) {
       y: mouseY,
       open: true,
     });
+  };
+  const handleSlotSelect = (slotInfo) => {
+
+    // clicked on one day
+    if (slotInfo.box) {
+      handleSelectedSlot(slotInfo.box.x, slotInfo.box.y, slotInfo.start, slotInfo.end);
+    } 
+    // clicked on more than one day
+    else if (slotInfo.bounds) {
+      handleSelectedSlot(slotInfo.bounds.x, slotInfo.bounds.y, slotInfo.start, slotInfo.end);
+    }
+
   };
 
   // what the user clicked on
@@ -219,6 +294,7 @@ export default function Dashboard({timetables}) {
         // if the user chose to delete
         if (choice){
           // call api to delete the event
+          deleteTimetable();
         }
         // delete the event
         break;
@@ -234,6 +310,7 @@ export default function Dashboard({timetables}) {
         setEventDialog({...eventDialog, open: false});
         if (choice) {
           // call api to create the event
+          createEvent(inputs);
         }
         break;
     }
@@ -248,9 +325,6 @@ export default function Dashboard({timetables}) {
       description: null
     });
   };
-
-
-  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <div className={classes.root}>
@@ -289,15 +363,36 @@ export default function Dashboard({timetables}) {
           </IconButton>
         </div>
         <Divider />
-        <List>{mainListItems}</List>
+        <List>
+          <NewTimetableDialog refreshData={refreshData}>
+          </NewTimetableDialog>
+        </List>
         <Divider />
-        <GetTimetables timetables={timetables} handleTimetableSelect={handleTimetableSelect} handleSelectedEvent={handleSelectedEvent} handleSelectedSlot={handleSelectedSlot} ></GetTimetables>
+        <GetTimetables currTimetable={currTimetable} timetables={timetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         {/*Use menu component for clicking on events*/}
         <Container maxWidth="lg" className={classes.container}>
-            {currTimetable}
+          { currTimetable ?
+          <Calendar
+            selectable
+            localizer={localizer}
+            defaultDate={new Date()}
+            defaultView="month"
+            events={currTimetableEvents}
+            style={{ height: "80vh" }}
+            onSelectSlot={handleSlotSelect}
+            onSelectEvent={(event, e) => handleEventSelect(event, e)}
+            components={{
+              event: Event,
+              agenda: {
+                event: EventAgenda,
+              },
+            }}
+          />
+          : initialMessage
+          }
         </Container>
         <Menu
           id="simple-menu"
