@@ -49,6 +49,7 @@ export default function SignIn() {
     }
     const res = await fetch('/api/signin', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });

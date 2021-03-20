@@ -20,8 +20,10 @@ handler.post(async (req, res, next) => {
         if (user.password !== generateHash(password, user.salt)) return res.status(401).end("This login is not valid");
 
         req.session.user = {email: user.email};
+        req.session.save();
         res.setHeader('Set-Cookie', cookie.serialize('username', user.email, {
-            path : '/'
+            path : '/',
+            maxAge: 60 * 60 * 24 * 7
         }));
         return res.json({email : user.email});
     });

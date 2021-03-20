@@ -5,8 +5,7 @@ import middleware from '../../middleware/index';
 const handler = nextConnect();
 handler.use(middleware);
 
-handler.get(async (req, res, next) => {
-    console.log(req.session.user || null);
+handler.get((req, res, next) => {
     return res.json(req.session.user || {});
 });
 

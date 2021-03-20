@@ -2,16 +2,18 @@ import session from 'express-session';
 import cookie from 'cookie';
 import connectMongo from 'connect-mongo';
 
-// const MongoStore = connectMongo(session);
+const MongoStore = connectMongo(session);
 
+// There is a known error attempting to use later versions of connect-mongo, solution says to downgrade version
 export function sessionMiddleware(req, res, next) {
-//   const mongoStore = new MongoStore({
-//     client: req.dbClient,
-//     stringify: false,
-//   });
+  const mongoStore = new MongoStore({
+    client: req.dbClient,
+    stringify: false,
+  });
   return session({
     secret: process.env.SESSION_SECRET,
-    // store: mongoStore,
+    cookie: { secure: false },
+    store: mongoStore,
     resave: false,
     saveUninitialized: true,
   })(req, res, next);

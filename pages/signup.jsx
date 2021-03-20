@@ -50,6 +50,7 @@ export default function SignUpPage() {
     }
     const res = await fetch('/api/signup', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
@@ -63,8 +64,6 @@ export default function SignUpPage() {
           console.log(error.text);
       });
       Router.replace('/');
-      // writing our user object to the state
-      // console.log(userObj);
     } else {
       setErrorMsg(await res.text());
     }

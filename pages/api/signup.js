@@ -26,9 +26,10 @@ handler.post(async (req, res, next) => {
         salt: salt
     }).then(({ ops }) => ops[0]);
     req.session.user = {email : user.email};
-
+    req.session.save();
     res.setHeader('Set-Cookie', cookie.serialize('username', user.email, {
-        path : '/'
+        path : '/',
+        maxAge: 60 * 60 * 24 * 7
     }));
     return res.json({email : user.email});
 });

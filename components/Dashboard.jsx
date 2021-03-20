@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import Router from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -107,6 +108,10 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 240,
   },
+  authButton: {
+    marginLeft: 5,
+    marginRight: 5
+  },
 }));
 
 const initialMessage = (
@@ -192,8 +197,18 @@ export default function Dashboard({timetables, user}) {
     setEnd(null);
   }
 
-  const handleLogout = () => {
-    
+  const handleLogout = async () => {
+    const res = await fetch('/api/signout', {
+      method: 'GET',
+      credentials: 'same-origin',
+    });
+    if (res.status === 200) {
+      console.log("logging out");
+      Router.replace('/');
+      
+    } else {
+      console.log(await res.text())
+    }
   }
 
   // dialogs
@@ -273,22 +288,22 @@ export default function Dashboard({timetables, user}) {
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             Dashboard
           </Typography>
-          {/* {!user ? (
+          {!user.email ? (
             <>
-            <Link href="/login" color="inherit">
+            <Link href="/login" color="inherit" className={classes.authButton}>
               Sign In
             </Link>
-            <Link href="/signup" color="inherit">
+            <Link href="/signup" color="inherit" className={classes.authButton}>
               Sign Up
             </Link>
             </>
           ) : (
             <>
-              <a tabIndex={0} role="button" onClick={handleLogout}>
+            <Link href="#" color="inherit" onClick={handleLogout} className={classes.authButton}>
               Logout
-              </a>
+            </Link>
             </>
-          )}           */}
+          )}          
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
