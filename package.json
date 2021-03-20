@@ -14,7 +14,7 @@
     "@material-ui/pickers": "^3.3.10",
     "bcrypt": "^5.0.1",
     "classnames": "^2.2.6",
-    "connect-mongo": "^4.4.0",
+    "connect-mongo": "^3.2.0",
     "cookie": "^0.4.1",
     "date-fns": "^2.19.0",
     "emailjs-com": "^2.6.4",

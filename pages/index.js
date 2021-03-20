@@ -4,8 +4,9 @@
 import Dashboard from '../components/Dashboard'
 import { useRouter } from 'next/router';
 // import useSWR from 'swr';
+import middleware from '../middleware/index';
 
-export default function Homepage({timetables}) {
+export default function Homepage({timetables, user}) {
 
   const router = useRouter();
 
@@ -16,24 +17,41 @@ export default function Homepage({timetables}) {
   return (
     // add a loading screen for fetching data
     
-    <Dashboard timetables = {timetables} refreshData={refreshData}>
+    <Dashboard timetables = {timetables} refreshData={refreshData} user={user}>
     </Dashboard>
   )
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps({req, res}) {
+  await middleware.run(req, res);
 
-  const res = await fetch('http://localhost:3000/api/timetables', {
-    method: 'GET',
-  });
   let timetable = [];
-  if (res.status === 200) {
-    timetable = await res.json();
-  }
 
+  const response = await fetch('http://localhost:3000/api/user', {
+    headers: {
+      cookie: req.headers.cookie
+    },
+    method: 'GET',
+    credentials: 'include'
+  });
+  let user;
+  if (response.status === 200) {
+    user = await response.json();
+
+    const res = await fetch('http://localhost:3000/api/timetables', {
+      method: 'GET',
+    });
+    if (res.status === 200) {
+      timetable = await res.json();
+    }
+
+  } else {
+    console.log(await response.text());
+  }
   return {
     props: {
       timetables: timetable,
+      user: user
     },
   };
 
