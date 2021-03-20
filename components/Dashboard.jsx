@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import Router from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,6 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
@@ -106,6 +108,10 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 240,
   },
+  authButton: {
+    marginLeft: 5,
+    marginRight: 5
+  },
 }));
 
 const initialMessage = (
@@ -114,7 +120,7 @@ const initialMessage = (
   </h1>
 );
 
-export default function Dashboard({timetables}) {
+export default function Dashboard({timetables, user}) {
   const classes = useStyles();
   
   // drawer on the side
@@ -189,6 +195,20 @@ export default function Dashboard({timetables}) {
     });
     setStart(null);
     setEnd(null);
+  }
+
+  const handleLogout = async () => {
+    const res = await fetch('/api/signout', {
+      method: 'GET',
+      credentials: 'same-origin',
+    });
+    if (res.status === 200) {
+      console.log("logging out");
+      Router.replace('/');
+      
+    } else {
+      console.log(await res.text())
+    }
   }
 
   // dialogs
@@ -268,6 +288,22 @@ export default function Dashboard({timetables}) {
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             Dashboard
           </Typography>
+          {!user.email ? (
+            <>
+            <Link href="/login" color="inherit" className={classes.authButton}>
+              Sign In
+            </Link>
+            <Link href="/signup" color="inherit" className={classes.authButton}>
+              Sign Up
+            </Link>
+            </>
+          ) : (
+            <>
+            <Link href="#" color="inherit" onClick={handleLogout} className={classes.authButton}>
+              Logout
+            </Link>
+            </>
+          )}          
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />

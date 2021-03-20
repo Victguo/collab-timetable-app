@@ -3,8 +3,9 @@
 // import utilStyles from '../styles/utils.module.css'
 import Dashboard from '../components/Dashboard'
 import { connectToDatabase } from '../middleware/mongodb'
+import middleware from '../middleware/index';
 
-export default function Homepage({timetables}) {
+export default function Homepage({timetables, user}) {
 
   return (
     // <Layout home>
@@ -20,24 +21,37 @@ export default function Homepage({timetables}) {
     //   </section>
     // </Layout>
     // <>
-    <Dashboard timetables = {timetables}>
+    <Dashboard timetables = {timetables} user={user}>
     </Dashboard>
   )
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps({req, res}) {
+  await middleware.run(req, res);
   const { db } = await connectToDatabase();
-
   const movies = await db
   .collection("movies")
   .find({})
   .sort({ metacritic: -1 })
   .limit(20)
   .toArray();
-
+  const response = await fetch('http://localhost:3000/api/user', {
+    headers: {
+      cookie: req.headers.cookie
+    },
+    method: 'GET',
+    credentials: 'include'
+  });
+  let user;
+  if (response.status === 200) {
+    user = await response.json();
+  } else {
+    console.log(await response.text());
+  }
   return {
     props: {
-      timetables: JSON.parse(JSON.stringify(movies)),
+      timetables: movies,
+      user: user
     },
   };
 
