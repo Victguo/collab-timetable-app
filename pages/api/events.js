@@ -53,4 +53,21 @@ handler.delete(async (req, res) => {
     return res.json(result);
 })
 
+handler.patch(async (req, res) => {
+    
+    // add authentication check here
+    const tableID = req.body.tableID;
+    const oldEvent = req.body.oldEvent;
+    const newEvent = req.body.newEvent;
+
+    if (!tableID || !oldEvent || !newEvent){
+        return res.status(400).send("Missing input");
+    }
+
+    const result = await req.db.collection('timetables').updateOne({_id: ObjectID(tableID), "events.title": oldEvent.title, "events.start": oldEvent.start, "events.end": oldEvent.end, "events.description": oldEvent.description}, {$set: {"events.$": newEvent}});
+
+    return res.json(result);
+})
+
+
 export default handler;

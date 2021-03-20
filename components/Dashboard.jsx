@@ -228,6 +228,42 @@ export default function Dashboard({timetables, refreshData}) {
     }
   }
 
+  const updateEvent = async(inputs) => {
+
+    const newEvent = {
+      start: inputs.startDate,
+      end: inputs.endDate,
+      title: inputs.eventName,
+      description: inputs.eventDescription
+    }
+
+    const oldEvent = {
+      start: selectedEvent.start,
+      end: selectedEvent.end,
+      title: selectedEvent.title,
+      description: selectedEvent.description
+    }
+
+    const res = await fetch('/api/events', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tableID: currTimetable,
+        oldEvent: oldEvent,
+        newEvent: newEvent
+      }),
+    });
+    if (res.status === 200) {
+
+      refreshEvents();
+
+    } else {
+      // some kinda error?
+
+      // make an alert saying something went wrong
+    }
+  }
+
   const refreshEvents = async() => {
     const res = await fetch('/api/events/' + currTimetable, {
       method: 'GET',
@@ -330,6 +366,7 @@ export default function Dashboard({timetables, refreshData}) {
         // if the user chose to make edits
         if (choice){
           // call api to edit the event
+          updateEvent(inputs);
         }
         break;
       case "create event":
