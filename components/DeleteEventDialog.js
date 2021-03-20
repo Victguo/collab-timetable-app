@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function DeleteEventDialog({open, handleCloseDialog}) {
+export default function DeleteEventDialog({selectedEvent, open, handleCloseDialog}) {
 
   return (
     <div>
@@ -25,7 +25,7 @@ export default function DeleteEventDialog({open, handleCloseDialog}) {
           <Button onClick={() => handleCloseDialog("delete", false, null)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => handleCloseDialog("delete", true, null)} color="primary">
+          <Button onClick={() => handleCloseDialog("delete", true, selectedEvent)} color="primary">
             Delete
           </Button>
         </DialogActions>

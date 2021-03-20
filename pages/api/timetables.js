@@ -34,8 +34,6 @@ handler.get(async (req, res) => {
 
 handler.delete(async (req, res) => {
     
-    // add authentication check here
-
     const result = await req.db.collection('timetables').findOneAndDelete({_id: ObjectID(req.body.tableID)}, function(err, table){
         if (err) return res.status(500).end(err);
         if (!table) return res.status(404).end("Timetable does not exist");

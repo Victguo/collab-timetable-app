@@ -191,7 +191,34 @@ export default function Dashboard({timetables, refreshData}) {
     });
     if (res.status === 200) {
 
-      // refreshData();
+      refreshEvents();
+
+    } else {
+      // some kinda error?
+
+      // make an alert saying something went wrong
+    }
+  }
+
+  const deleteEvent = async(inputs) => {
+
+    const event = {
+      start: inputs.start,
+      end: inputs.end,
+      title: inputs.title,
+      description: inputs.description
+    }
+
+    const res = await fetch('/api/events', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tableID: currTimetable,
+        event: event
+      }),
+    });
+    if (res.status === 200) {
+
       refreshEvents();
 
     } else {
@@ -267,7 +294,7 @@ export default function Dashboard({timetables, refreshData}) {
     setEnd(null);
   }
 
-  // dialogs
+  // event dialogs
   const [deleteDialog, setDeleteDialog] = React.useState(false);
   const [eventDialog, setEventDialog] = React.useState({type: "", open: false});
 
@@ -294,9 +321,8 @@ export default function Dashboard({timetables, refreshData}) {
         // if the user chose to delete
         if (choice){
           // call api to delete the event
-          deleteTimetable();
+          deleteEvent(inputs);
         }
-        // delete the event
         break;
       
       case "edit":
@@ -415,7 +441,7 @@ export default function Dashboard({timetables, refreshData}) {
         >
           <MenuItem onClick={() => handleCloseEvent("create event")}>New Event</MenuItem>
         </Menu>
-        <DeleteEventDialog open={deleteDialog} handleCloseDialog={handleCloseDialog}></DeleteEventDialog>
+        <DeleteEventDialog selectedEvent={selectedEvent} open={deleteDialog} handleCloseDialog={handleCloseDialog}></DeleteEventDialog>
         <EventDialog selectedEvent={selectedEvent} type={eventDialog.type} open={eventDialog.open} handleCloseDialog={handleCloseDialog} start={start} end={end}></EventDialog>
 
       </main>

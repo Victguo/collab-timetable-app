@@ -41,12 +41,14 @@ handler.post(async (req, res, next) => {
 handler.delete(async (req, res) => {
     
     // add authentication check here
+    const tableID = req.body.tableID;
+    const event = req.body.event;
 
-    const result = await req.db.collection('timetables').findOneAndDelete({_id: ObjectID(req.body.tableID)}, function(err, table){
-        if (err) return res.status(500).end(err);
-        if (!table) return res.status(404).end("Timetable does not exist");
+    if (!tableID || !event){
+        return res.status(400).send("Missing input");
+    }
 
-    });
+    const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
 
     return res.json(result);
 })
