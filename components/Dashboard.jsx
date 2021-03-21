@@ -162,10 +162,6 @@ export default function Dashboard({timetables, refreshData, user}) {
 
   }
 
-  function getCurrTimetable() {
-    return currTimetable;
-  }
-
   // clicking on events
   const [selectedEvent, setSelectedEvent] = React.useState({x: 0, y: 0, open: false, start: null, end: null, name: null, description: null});
 
@@ -481,6 +477,7 @@ export default function Dashboard({timetables, refreshData, user}) {
           { currTimetable ? ( user.email ? 
           <Calendar
             selectable
+            views={['month', 'agenda']}
             localizer={localizer}
             defaultDate={new Date()}
             defaultView="month"
