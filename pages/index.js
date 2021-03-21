@@ -38,11 +38,16 @@ export async function getServerSideProps({req, res}) {
   if (response.status === 200) {
     user = await response.json();
 
-    const res = await fetch('http://localhost:3000/api/timetables', {
-      method: 'GET',
-    });
-    if (res.status === 200) {
-      timetable = await res.json();
+    if (user.email){
+      const res = await fetch('http://localhost:3000/api/timetables/' + user.email, {
+        headers: {
+          cookie: req.headers.cookie
+        },
+        method: 'GET',
+      });
+      if (res.status === 200) {
+        timetable = await res.json();
+      }
     }
 
   } else {

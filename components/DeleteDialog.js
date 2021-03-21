@@ -5,12 +5,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 
-export default function DeleteDialog({type, tableID, refreshData}) {
+export default function DeleteDialog({setTimetable, currTimetable, type, tableID, refreshData}) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -35,7 +34,12 @@ export default function DeleteDialog({type, tableID, refreshData}) {
     });
     if (res.status === 200) {
 
-      refreshData();
+      // edge case of deleting currently selected timetable
+      if (tableID == currTimetable) {
+        setTimetable(null);
+
+      }
+      refreshData();      
 
     } else {
       // some kinda error?

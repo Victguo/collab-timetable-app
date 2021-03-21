@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function GetTimetables({currTimetable, timetables, handleTimetableSelect, refreshData}) {
+export default function GetTimetables({setTimetable, currTimetable, timetables, handleTimetableSelect, refreshData}) {
 
   const classes = useStyles();
 
@@ -47,7 +47,7 @@ export default function GetTimetables({currTimetable, timetables, handleTimetabl
         selected={currTimetable === table._id} 
         onClick={(event) => handleListItemClick(event, table._id, table.events)}
       >
-        <DeleteDialog type="timetable" tableID={table._id} refreshData={refreshData}></DeleteDialog>
+        <DeleteDialog setTimetable={setTimetable} currTimetable={currTimetable} type="timetable" tableID={table._id} refreshData={refreshData}></DeleteDialog>
         <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
       </ListItem>
     ))}

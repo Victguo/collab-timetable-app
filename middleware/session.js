@@ -1,6 +1,6 @@
 import session from 'express-session';
 import cookie from 'cookie';
-// import connectMongo from 'connect-mongo';
+import connectMongo from 'connect-mongo';
 
 const MongoStore = connectMongo(session);
 

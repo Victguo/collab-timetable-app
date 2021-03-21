@@ -159,6 +159,11 @@ export default function Dashboard({timetables, refreshData, user}) {
 
     setTimetable(timetableID);
     setCurrTimetableEvents(events);
+
+  }
+
+  function getCurrTimetable() {
+    return currTimetable;
   }
 
   // clicking on events
@@ -463,17 +468,17 @@ export default function Dashboard({timetables, refreshData, user}) {
         </div>
         <Divider />
         <List>
-          <NewTimetableDialog refreshData={refreshData}>
+          <NewTimetableDialog refreshData={refreshData} user={user}>
           </NewTimetableDialog>
         </List>
         <Divider />
-        <GetTimetables currTimetable={currTimetable} timetables={timetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
+        <GetTimetables setTimetable={setTimetable} currTimetable={currTimetable} timetables={timetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         {/*Use menu component for clicking on events*/}
         <Container maxWidth="lg" className={classes.container}>
-          { currTimetable ?
+          { currTimetable ? ( user.email ? 
           <Calendar
             selectable
             localizer={localizer}
@@ -489,7 +494,7 @@ export default function Dashboard({timetables, refreshData, user}) {
                 event: EventAgenda,
               },
             }}
-          />
+          />: initialMessage)
           : initialMessage
           }
         </Container>

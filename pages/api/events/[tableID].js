@@ -9,6 +9,7 @@ handler.use(middleware);
 handler.get(async (req, res) => {
 
     const {tableID} = req.query;
+    const user = req.user.email;
 
     // check that 
 
@@ -20,8 +21,12 @@ handler.get(async (req, res) => {
     if (!timetable) {
         return res.status(404).send("Timetable not found");
     }
-
-    res.send(timetable.events);
+    if (timetable.userID != user) {
+        res.status(401).end("access denied");
+    }
+    else {
+        res.send(timetable.events);
+    }
 })
 
 export default handler;

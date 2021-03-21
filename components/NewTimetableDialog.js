@@ -11,7 +11,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import AddIcon from '@material-ui/icons/Add';
 
-export default function NewTimetableDialog({refreshData}) {
+export default function NewTimetableDialog({refreshData, user}) {
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState("");
 
@@ -37,12 +37,10 @@ export default function NewTimetableDialog({refreshData}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: title,
-        owner: "test"
+        userID: user.email
       }),
     });
     if (res.status === 200) {
-      const timetable = await res.json();
-      // update the timetable
 
       refreshData();
 
