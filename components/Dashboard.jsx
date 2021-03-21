@@ -121,6 +121,12 @@ const initialMessage = (
   </h1>
 );
 
+const signInMessage = (
+  <h1>
+    Please sign in or sign up!
+  </h1>
+);
+
 function Event({ event }) {
   return (
     <span>
@@ -464,17 +470,21 @@ export default function Dashboard({timetables, refreshData, user}) {
         </div>
         <Divider />
         <List>
-          <NewTimetableDialog refreshData={refreshData} user={user}>
-          </NewTimetableDialog>
+          {user.email ? 
+            <NewTimetableDialog refreshData={refreshData} user={user}>
+            </NewTimetableDialog> : null
+          }
         </List>
         <Divider />
-        <GetTimetables setTimetable={setTimetable} currTimetable={currTimetable} timetables={timetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
+        {user.email ? 
+          <GetTimetables setTimetable={setTimetable} currTimetable={currTimetable} timetables={timetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
+          : null}
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         {/*Use menu component for clicking on events*/}
         <Container maxWidth="lg" className={classes.container}>
-          { currTimetable ? ( user.email ? 
+          { user.email ? ( currTimetable ? 
           <Calendar
             selectable
             views={['month', 'agenda']}
@@ -492,7 +502,7 @@ export default function Dashboard({timetables, refreshData, user}) {
               },
             }}
           />: initialMessage)
-          : initialMessage
+          : signInMessage
           }
         </Container>
         <Menu
