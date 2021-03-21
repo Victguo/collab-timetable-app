@@ -27,7 +27,10 @@ export async function getServerSideProps({req, res}) {
 
   let timetable = [];
 
-  const response = await fetch('http://localhost:3000/api/user', {
+  const protocol = req.headers['x-forwarded-proto'] || 'http';
+  const baseUrl = req ? `${protocol}://${req.headers.host}` : '';
+
+  const response = await fetch(baseUrl + '/api/user', {
     headers: {
       cookie: req.headers.cookie
     },
@@ -39,7 +42,7 @@ export async function getServerSideProps({req, res}) {
     user = await response.json();
 
     if (user.email){
-      const res = await fetch('http://localhost:3000/api/timetables/' + user.email, {
+      const res = await fetch(baseUrl + '/api/timetables/' + user.email, {
         headers: {
           cookie: req.headers.cookie
         },
