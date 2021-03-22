@@ -23,6 +23,7 @@ handler.post(async (req, res, next) => {
     const user = await req.db.collection('users').insertOne({
         email: email,
         password: hash,
+        timetables: [],
         salt: salt
     }).then(({ ops }) => ops[0]);
     req.session.user = {email : user.email};

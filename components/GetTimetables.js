@@ -6,6 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import DeleteDialog from './DeleteDialog';
+import ShareDialog from './ShareDialog';
 import { makeStyles } from '@material-ui/core/styles';
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -49,6 +50,7 @@ export default function GetTimetables({setTimetable, currTimetable, timetables, 
       >
         <DeleteDialog setTimetable={setTimetable} currTimetable={currTimetable} type="timetable" tableID={table._id} refreshData={refreshData}></DeleteDialog>
         <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
+        <ShareDialog tableName={table.title} tableID={table._id} refreshData={refreshData}></ShareDialog>
       </ListItem>
     ))}
     <ListSubheader disableSticky inset>Shared with you</ListSubheader>
