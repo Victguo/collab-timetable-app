@@ -12,10 +12,17 @@ import IconButton from '@material-ui/core/IconButton';
 export default function ShareDialog({tableName, tableID, refreshData}) {
   const [open, setOpen] = React.useState(false);
   const [shareLink, setShareLink] = React.useState('');
+  let url;
+  let baseUrl;
+
+  if (typeof window !== "undefined") {
+    url = window.location;
+    baseUrl = url.protocol + "//" + url.host + "/" + url.pathname.split('/')[1];
+  }
 
   const handleClickOpen = async () => {
-    console.log(tableName);
     setOpen(true);
+    
     const res = await fetch('/api/invite/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -26,7 +33,7 @@ export default function ShareDialog({tableName, tableID, refreshData}) {
       let timetableInvite;
       if (res.status === 200) {
         timetableInvite = await res.json();
-        setShareLink(timetableInvite._id);
+        setShareLink(baseUrl + "invite/" + timetableInvite._id);
         refreshData();      
   
       } else {
@@ -60,7 +67,7 @@ export default function ShareDialog({tableName, tableID, refreshData}) {
             The link below will allow other users to access timetable "{tableName}"
           </DialogContentText>
           <DialogContentText>
-          http://localhost:3000/invite/{shareLink}
+          {shareLink}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
