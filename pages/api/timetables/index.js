@@ -19,7 +19,6 @@ handler.post(async (req, res, next) => {
     if (user && user == userID) {
         let timetable = {
             title: title,
-            // change to user after
             userID: userID,
             events: []
         }
