@@ -24,7 +24,7 @@ handler.post(async (req, res, next) => {
             events: []
         }
         const result = await req.db.collection('timetables').insertOne(timetable).then(({ ops }) => ops[0]);
-        pusher.trigger('timetable-channel', 'new-timetable', []);
+        pusher.trigger('timetable-channel', 'timetable-change', user);
         return res.json({result});
     }
     else {
@@ -44,7 +44,7 @@ handler.delete(async (req, res) => {
     } 
     else {
         const result = await req.db.collection('timetables').findOneAndDelete({_id: ObjectID(req.body.tableID)});
-    
+        pusher.trigger('timetable-channel', 'timetable-change', user);
         return res.json(result);
     }
 })

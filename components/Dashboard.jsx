@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import Router from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
@@ -143,8 +143,22 @@ function EventAgenda({ event }) {
   )
 }
 
-export default function Dashboard({timetables, refreshData, user}) {
+export default function Dashboard({eventChannel, timetables, refreshData, user}) {
   const classes = useStyles();
+
+  // listen for realtime event updates
+  useEffect(() => {
+    eventChannel.bind('event-change', (results) => {
+      
+      let accessToTable = timetables.find( timetable => timetable['_id'] === results.tableID );
+
+      // check if user is the owner or has access to the table
+      if (results.user == user.email || accessToTable) {
+        refreshEvents(results.tableID);
+      }
+
+    })
+  }, []); // only change if user changes
   
   // drawer on the side
   const [open, setOpen] = React.useState(true);
@@ -274,8 +288,8 @@ export default function Dashboard({timetables, refreshData, user}) {
     }
   }
 
-  const refreshEvents = async() => {
-    const res = await fetch('/api/events/' + currTimetable, {
+  const refreshEvents = async(timetable = currTimetable) => {
+    const res = await fetch('/api/events/' + timetable, {
       method: 'GET',
     });
     if (res.status === 200) {
@@ -340,7 +354,6 @@ export default function Dashboard({timetables, refreshData, user}) {
     setEnd(null);
   }
 
-  // event dialogs
   const handleLogout = async () => {
     const res = await fetch('/api/signout', {
       method: 'GET',
@@ -355,7 +368,7 @@ export default function Dashboard({timetables, refreshData, user}) {
     }
   }
 
-  // dialogs
+  // event dialogs
   const [deleteDialog, setDeleteDialog] = React.useState(false);
   const [eventDialog, setEventDialog] = React.useState({type: "", open: false});
 

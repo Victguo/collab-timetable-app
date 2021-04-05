@@ -14,7 +14,7 @@ export var pusher = new Pusher('3d233baf43924a505592', {
 })
 
 const timetableChannel = pusher.subscribe('timetable-channel');
-
+const eventChannel = pusher.subscribe('event-channel');
 
 export default function Homepage({timetables, user}) {
 
@@ -25,15 +25,20 @@ export default function Homepage({timetables, user}) {
   }
 
   useEffect(() => {
-    timetableChannel.bind('new-timetable', newTable => {
-      refreshData();
+    timetableChannel.bind('timetable-change', updateUser => {
+      // check if the user is the currently signed in one
+      //      need to add in if the user is shared with the timetable too
+      if (user.email == updateUser){
+        
+        refreshData();
+      }
     })
   }, []); // only change if user changes
 
   return (
     // add a loading screen for fetching data
     
-    <Dashboard timetables = {timetables} refreshData={refreshData} user={user}>
+    <Dashboard eventChannel={eventChannel} timetables = {timetables} refreshData={refreshData} user={user}>
     </Dashboard>
   )
 }
