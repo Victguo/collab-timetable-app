@@ -5,6 +5,16 @@ import Dashboard from '../components/Dashboard'
 import { useRouter } from 'next/router';
 // import useSWR from 'swr';
 import middleware from '../middleware/index';
+import Pusher, { Channel } from 'pusher-js';
+import { useEffect } from 'react';
+
+export var pusher = new Pusher('3d233baf43924a505592', {
+  cluster: 'us2',
+  encrypted: true
+})
+
+const timetableChannel = pusher.subscribe('timetable-channel');
+
 
 export default function Homepage({timetables, user}) {
 
@@ -13,6 +23,12 @@ export default function Homepage({timetables, user}) {
   const refreshData = () => {
     router.replace(router.asPath);
   }
+
+  useEffect(() => {
+    timetableChannel.bind('new-timetable', newTable => {
+      refreshData();
+    })
+  }, []); // only change if user changes
 
   return (
     // add a loading screen for fetching data

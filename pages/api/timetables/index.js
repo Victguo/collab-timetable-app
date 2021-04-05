@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
 import middleware from '../../../middleware/index';
-import cookie from 'cookie';
 import { ObjectID } from 'bson';
+import { pusher } from '../../../middleware/index';
 
 const handler = nextConnect();
 handler.use(middleware);
@@ -24,7 +24,7 @@ handler.post(async (req, res, next) => {
             events: []
         }
         const result = await req.db.collection('timetables').insertOne(timetable).then(({ ops }) => ops[0]);
-    
+        pusher.trigger('timetable-channel', 'new-timetable', []);
         return res.json({result});
     }
     else {
