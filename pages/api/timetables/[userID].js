@@ -15,10 +15,11 @@ handler.get(async (req, res) => {
     }
 
     if (user && user == userID) {
-
-        const timetables = await req.db.collection('timetables').find({userID: userID}).sort({_id: -1}).toArray();
-        res.send(timetables);
-
+        req.db.collection('users').findOne({email: userID}, async function (err, user) {
+            if (err) return res.status(500).end(err);
+            const timetables = await req.db.collection('timetables').find({_id: {$in: user.timetables}}).sort({_id: -1}).toArray();
+            res.send(timetables);
+        });
     } else {
         res.status(401).end("access denied");
     }
