@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
 import middleware from '../../../middleware/index';
-import cookie from 'cookie';
 import { ObjectID } from 'bson';
+import { pusher } from '../../../middleware/index';
 
 const handler = nextConnect();
 handler.use(middleware);
@@ -19,13 +19,18 @@ handler.post(async (req, res, next) => {
     if (user && user == userID) {
         let timetable = {
             title: title,
-            // change to user after
             userID: userID,
             events: []
         }
-        const result = await req.db.collection('timetables').insertOne(timetable).then(({ ops }) => ops[0]);
-    
-        return res.json({result});
+        req.db.collection('timetables').insertOne(timetable, function (err, timetableDoc) {
+            if (err) return res.status(500).end(err);
+            req.db.collection('users').updateOne({email: req.user.email},{ $addToSet: {timetables : timetableDoc.ops[0]._id }},
+                function(err, updatedUser) {
+                    if (err) return res.status(500).end(err);
+                    pusher.trigger('timetable-channel', 'timetable-change', user);
+                    return res.json({email: updatedUser.email, timetables: updatedUser.timetables});
+            });
+        });
     }
     else {
         res.status(401).end("access denied");
@@ -43,9 +48,15 @@ handler.delete(async (req, res) => {
         res.status(401).end("only timetable owner can delete");
     } 
     else {
-        const result = await req.db.collection('timetables').findOneAndDelete({_id: ObjectID(req.body.tableID)});
-    
-        return res.json(result);
+        req.db.collection('timetables').findOneAndDelete({_id: ObjectID(req.body.tableID)}, function (err, docs) {
+            if (err) return res.status(500).end(err);
+            req.db.collection('users').updateMany({ timetables: ObjectID(req.body.tableID) }, { $pull: { timetables: ObjectID(req.body.tableID)}},
+                function (err, userDocs) {
+                    if (err) return res.status(500).end(err);
+                    pusher.trigger('timetable-channel', 'timetable-change', user);
+                    return res.json(docs);
+                });
+        });   
     }
 })
 

@@ -5,6 +5,16 @@ import Dashboard from '../components/Dashboard'
 import { useRouter } from 'next/router';
 // import useSWR from 'swr';
 import middleware from '../middleware/index';
+import Pusher from 'pusher-js';
+import { useEffect } from 'react';
+
+export var pusher = new Pusher('3d233baf43924a505592', {
+  cluster: 'us2',
+  encrypted: true
+})
+
+const timetableChannel = pusher.subscribe('timetable-channel');
+const eventChannel = pusher.subscribe('event-channel');
 
 export default function Homepage({timetables, user}) {
 
@@ -14,10 +24,21 @@ export default function Homepage({timetables, user}) {
     router.replace(router.asPath);
   }
 
+  useEffect(() => {
+    timetableChannel.bind('timetable-change', updateUser => {
+      // check if the user is the currently signed in one
+      //      need to add in if the user is shared with the timetable too
+      if (user.email == updateUser){
+        
+        refreshData();
+      }
+    })
+  }, []); // only change if user changes
+
   return (
     // add a loading screen for fetching data
     
-    <Dashboard timetables = {timetables} refreshData={refreshData} user={user}>
+    <Dashboard eventChannel={eventChannel} timetables = {timetables} refreshData={refreshData} user={user}>
     </Dashboard>
   )
 }

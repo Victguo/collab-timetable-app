@@ -2,6 +2,8 @@ import nextConnect from 'next-connect';
 import middleware from '../../../middleware/index';
 import cookie from 'cookie';
 import { ObjectID } from 'bson';
+import { pusher } from '../../../middleware/index';
+
 
 const handler = nextConnect();
 handler.use(middleware);
@@ -24,11 +26,15 @@ handler.post(async (req, res, next) => {
         return res.status(400).send("Please enter a date");
     }
 
-    // check to see if signed in user is timetable owner
     const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
 
+    if (!timetable) {
+        res.status(404).send("timetable does not exist or has been deleted");
+    }
+    
+    // check to see if signed in user is timetable owner
     if (timetable.userID != user) {
-        res.status(401).end("access denied");
+        res.status(401).send("access denied");
     }
     else {
         let event = {
@@ -40,7 +46,8 @@ handler.post(async (req, res, next) => {
         }
         
         const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$push: {events: event}});
-    
+        pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user});
+
         return res.json({result});
     }
 });
@@ -56,14 +63,19 @@ handler.delete(async (req, res) => {
         return res.status(400).send("Missing input");
     }
 
-    // check to see if signed in user is timetable owner
     const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+    
+    if (!timetable) {
+        res.status(404).send("timetable does not exist or has been deleted");
+    }
 
+    // check to see if signed in user is timetable owner
     if (timetable.userID != user) {
         res.status(401).end("access denied");
     }
     else {
         const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
+        pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user});
 
         return res.json(result);
     }
@@ -81,15 +93,19 @@ handler.patch(async (req, res) => {
         return res.status(400).send("Missing input");
     }
 
-    // check to see if signed in user is timetable owner
     const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
 
+    if (!timetable) {
+        res.status(404).send("timetable does not exist or has been deleted");
+    }
+
+    // check to see if signed in user is timetable owner
     if (timetable.userID != user) {
         res.status(401).end("access denied");
     }
     else {
-
         const result = await req.db.collection('timetables').updateOne({_id: ObjectID(tableID), "events.title": oldEvent.title, "events.start": oldEvent.start, "events.end": oldEvent.end, "events.description": oldEvent.description}, {$set: {"events.$": newEvent}});
+        pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user});
 
         return res.json(result);
     }

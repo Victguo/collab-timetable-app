@@ -9,7 +9,6 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import Grid from '@material-ui/core/Grid';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DateFnsUtils from '@date-io/date-fns';
@@ -21,8 +20,8 @@ import {
 
 export default function EventDialog({selectedEvent, type, open, handleCloseDialog, start, end}) {
 
-  const [eventName, setEventName] = React.useState(null);
-  const [eventDescription, setEventDescription] = React.useState(null);
+  const [eventName, setEventName] = React.useState("");
+  const [eventDescription, setEventDescription] = React.useState("");
   const [startDate, setStartDate] = React.useState(start);
   const [endDate, setEndDate] = React.useState(end);
   const [invalidName, setInvalidName] = React.useState(false);
