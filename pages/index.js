@@ -5,7 +5,7 @@ import Dashboard from '../components/Dashboard'
 import { useRouter } from 'next/router';
 // import useSWR from 'swr';
 import middleware from '../middleware/index';
-import Pusher, { Channel } from 'pusher-js';
+import Pusher from 'pusher-js';
 import { useEffect } from 'react';
 
 export var pusher = new Pusher('3d233baf43924a505592', {
