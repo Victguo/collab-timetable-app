@@ -5,8 +5,8 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import DeleteDialog from './DeleteDialog';
-import ShareDialog from './ShareDialog';
+import DeleteDialog from './dialogs/DeleteDialog';
+import ShareDialog from './dialogs/ShareDialog';
 import { makeStyles } from '@material-ui/core/styles';
 import "react-big-calendar/lib/css/react-big-calendar.css";
 

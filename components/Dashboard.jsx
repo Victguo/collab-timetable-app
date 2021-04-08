@@ -17,14 +17,15 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import GetTimetables from '../components/GetTimetables';
-import NewTimetableDialog from './NewTimetableDialog';
+import NewTimetableDialog from './dialogs/NewTimetableDialog';
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import DeleteEventDialog from '../components/DeleteEventDialog';
-import EventDialog from '../components/EventDialog';
+import DeleteEventDialog from '../components/dialogs/DeleteEventDialog';
+import EventDialog from '../components/dialogs/EventDialog';
+import CustomWeekView from '../components/calendar/CustomWeekView';
 
 const localizer = momentLocalizer(moment);
 
@@ -176,7 +177,11 @@ export default function Dashboard({eventChannel, timetables, refreshData, user})
   const handleTimetableSelect = (timetableID, events) => {
 
     setTimetable(timetableID);
-    setCurrTimetableEvents(events);
+
+    // convert all iso date strings into a date object
+    let convertedEvents = events.map(event => ({title: event.title, tableID: event.tableID, start: new Date(event.start), end: new Date(event.end), description: event.description}));
+
+    setCurrTimetableEvents(convertedEvents);
 
   }
 
@@ -295,7 +300,11 @@ export default function Dashboard({eventChannel, timetables, refreshData, user})
     if (res.status === 200) {
 
       let returnedEvents = await res.json();
-      setCurrTimetableEvents(returnedEvents);
+
+      // convert all the date strings back into a date object
+      let convertedEvents = returnedEvents.map(event => ({title: event.title, tableID: event.tableID, start: new Date(event.start), end: new Date(event.end), description: event.description}));
+
+      setCurrTimetableEvents(convertedEvents);
     }
   }
 
@@ -498,7 +507,7 @@ export default function Dashboard({eventChannel, timetables, refreshData, user})
           { user.email ? ( currTimetable ? 
           <Calendar
             selectable
-            views={['month', 'agenda']}
+            views={{month: true, week: CustomWeekView, agenda: true}}
             localizer={localizer}
             defaultDate={new Date()}
             defaultView="month"
