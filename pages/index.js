@@ -46,7 +46,7 @@ export default function Homepage({timetables, sharedTimetables, user}) {
 export async function getServerSideProps({req, res}) {
   await middleware.run(req, res);
 
-  let timetable = {};
+  let timetable = {timetables: [], sharedTimetables: []};
   let user = null;
 
   const protocol = req.headers['x-forwarded-proto'] || 'http';
@@ -73,7 +73,6 @@ export async function getServerSideProps({req, res}) {
         });
         if (res.status === 200) {
           timetable = await res.json();
-          console.log(timetable);
         }
       }
   
