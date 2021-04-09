@@ -1,5 +1,5 @@
 import nextConnect from 'next-connect';
-import middleware from '../../middleware/index';
+import middleware from '../../../middleware/index';
 import cookie from 'cookie';
 
 const handler = nextConnect();

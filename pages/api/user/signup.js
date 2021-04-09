@@ -1,8 +1,8 @@
 import nextConnect from 'next-connect';
 import isEmail from 'validator/lib/isEmail';
-import middleware from '../../middleware/index';
+import middleware from '../../../middleware/index';
 import cookie from 'cookie';
-import {generateHash, generateSalt} from '../../utils/auth';
+import {generateHash, generateSalt} from '../../../utils/auth';
 
 const handler = nextConnect();
 handler.use(middleware);
@@ -24,6 +24,7 @@ handler.post(async (req, res, next) => {
         email: email,
         password: hash,
         timetables: [],
+        sharedTimetables: [],
         salt: salt
     }).then(({ ops }) => ops[0]);
     req.session.user = {email : user.email};

@@ -144,7 +144,7 @@ function EventAgenda({ event }) {
   )
 }
 
-export default function Dashboard({eventChannel, timetables, refreshData, user}) {
+export default function Dashboard({eventChannel, timetables, sharedTimetables, refreshData, user}) {
   const classes = useStyles();
 
   // listen for realtime event updates
@@ -455,10 +455,10 @@ export default function Dashboard({eventChannel, timetables, refreshData, user})
           </Typography>
           {!user.email ? (
             <>
-            <Link href="/login" color="inherit" className={classes.authButton}>
+            <Link href="/user/login" color="inherit" className={classes.authButton}>
               Sign In
             </Link>
-            <Link href="/signup" color="inherit" className={classes.authButton}>
+            <Link href="/user/signup" color="inherit" className={classes.authButton}>
               Sign Up
             </Link>
             </>
@@ -497,7 +497,7 @@ export default function Dashboard({eventChannel, timetables, refreshData, user})
         </List>
         <Divider />
         {user.email ? 
-          <GetTimetables setTimetable={setTimetable} currTimetable={currTimetable} timetables={timetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
+          <GetTimetables setTimetable={setTimetable} currTimetable={currTimetable} timetables={timetables} sharedTimetables={sharedTimetables} handleTimetableSelect={handleTimetableSelect} refreshData={refreshData} ></GetTimetables>
           : null}
       </Drawer>
       <main className={classes.content}>

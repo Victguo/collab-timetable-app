@@ -15,7 +15,7 @@ handler.post(async (req, res, next) => {
         if (!timetableInvite) return res.status(401).end("This invite is invalid");
         // TODO: Add this timetable to the user
         console.log(timetableInvite.tableID);
-        req.db.collection('users').updateOne({email: req.user.email},{ $addToSet: {timetables : ObjectId(timetableInvite.tableID) }},
+        req.db.collection('users').updateOne({email: req.user.email},{ $addToSet: {sharedTimetables : ObjectId(timetableInvite.tableID) }},
             function(err, updatedUser) {
                 if (err) return res.status(500).end(err);
                 return res.json({email: updatedUser.email})

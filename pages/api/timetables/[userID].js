@@ -18,7 +18,9 @@ handler.get(async (req, res) => {
         req.db.collection('users').findOne({email: userID}, async function (err, user) {
             if (err) return res.status(500).end(err);
             const timetables = await req.db.collection('timetables').find({_id: {$in: user.timetables}}).sort({_id: -1}).toArray();
-            res.send(timetables);
+            const sharedTimetables = await req.db.collection('timetables').find({_id: {$in: user.sharedTimetables}}).sort({_id: -1}).toArray();
+
+            res.send({timetables, sharedTimetables});
         });
     } else {
         res.status(401).end("access denied");
