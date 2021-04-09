@@ -364,7 +364,7 @@ export default function Dashboard({eventChannel, timetables, refreshData, user})
   }
 
   const handleLogout = async () => {
-    const res = await fetch('/api/signout', {
+    const res = await fetch('/api/user/signout', {
       method: 'GET',
       credentials: 'same-origin',
     });

@@ -48,7 +48,7 @@ export default function SignUpPage() {
     if (!body.password) {
       return setErrorMsg("Please enter a password");
     }
-    const res = await fetch('/api/signup', {
+    const res = await fetch('/api/user/signup', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },

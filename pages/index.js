@@ -51,7 +51,7 @@ export async function getServerSideProps({req, res}) {
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const baseUrl = req ? `${protocol}://${req.headers.host}` : '';
 
-  const response = await fetch(baseUrl + '/api/user', {
+  const response = await fetch(baseUrl + '/api/user/getuser', {
     headers: {
       cookie: req.headers.cookie
     },

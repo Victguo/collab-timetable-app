@@ -47,7 +47,7 @@ export default function SignIn() {
     if (!body.password) {
       return setErrorMsg("Please enter a password");
     }
-    const res = await fetch('/api/signin', {
+    const res = await fetch('/api/user/signin', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
