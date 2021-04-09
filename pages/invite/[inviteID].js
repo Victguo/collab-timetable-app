@@ -4,9 +4,9 @@ import middleware from '../../middleware/index';
 export default function InvitePage({invited}) {
   const router = useRouter();
   const { inviteID } = router.query;
-  console.log(invited);
   if(invited) {
-    return <p>Invite Successful</p>
+    router.replace('/');
+    return null;
   } else {
     return <p>Invite Failed</p>
   }
