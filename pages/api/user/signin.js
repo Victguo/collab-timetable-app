@@ -1,8 +1,8 @@
 import nextConnect from 'next-connect';
 import isEmail from 'validator/lib/isEmail';
-import middleware from '../../middleware/index';
+import middleware from '../../../middleware/index';
 import cookie from 'cookie';
-import {generateHash} from '../../utils/auth';
+import {generateHash} from '../../../utils/auth';
 
 
 const handler = nextConnect();
