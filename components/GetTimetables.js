@@ -9,6 +9,10 @@ import DeleteDialog from './dialogs/DeleteDialog';
 import ShareDialog from './dialogs/ShareDialog';
 import { makeStyles } from '@material-ui/core/styles';
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import ShareIcon from '@material-ui/icons/Share';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function GetTimetables({setTimetable, currTimetable, timetables, handleTimetableSelect, refreshData}) {
+export default function GetTimetables({setTimetable, currTimetable, timetables, sharedTimetables, handleTimetableSelect, refreshData}) {
 
   const classes = useStyles();
 
@@ -54,6 +58,25 @@ export default function GetTimetables({setTimetable, currTimetable, timetables, 
       </ListItem>
     ))}
     <ListSubheader disableSticky inset>Shared with you</ListSubheader>
-
+    {sharedTimetables.map((table) => (
+      <ListItem 
+        key={table._id} 
+        button 
+        selected={currTimetable === table._id} 
+        onClick={(event) => handleListItemClick(event, table._id, table.events)}
+      >
+        <Tooltip>
+          <IconButton disabled >
+              <DeleteIcon/>
+          </IconButton>
+        </Tooltip>
+        <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
+        <Tooltip >
+            <IconButton disabled>
+                <ShareIcon/>
+            </IconButton>
+        </Tooltip>
+      </ListItem>
+    ))}
   </List>);
 };

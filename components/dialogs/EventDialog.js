@@ -67,6 +67,15 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
     setEndDate(date);
   };
 
+  const clearForm = () =>{
+    setEventName("");
+    setEventDescription("");
+    setStartDate(null);
+    setEndDate(null);
+    setInvalidName(false);
+    setInvalidDate(false);
+  }
+
   const validateInput = (submit) => {
 
     // if the user chose to submit
@@ -81,18 +90,14 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
       }
       else {
         handleCloseDialog(type, true, {eventName: eventName, eventDescription: eventDescription, startDate: startDate, endDate: endDate});
+        clearForm();
       }
     }
     // user chose to cancel
     else {
       handleCloseDialog(type, false, null)
+      clearForm();
     }
-    setEventName("");
-    setEventDescription("");
-    setStartDate(null);
-    setEndDate(null);
-    setInvalidName(false);
-    setInvalidDate(false);
   }
 
   return (

@@ -16,7 +16,7 @@ export var pusher = new Pusher('3d233baf43924a505592', {
 const timetableChannel = pusher.subscribe('timetable-channel');
 const eventChannel = pusher.subscribe('event-channel');
 
-export default function Homepage({timetables, user}) {
+export default function Homepage({timetables, sharedTimetables, user}) {
 
   const router = useRouter();
 
@@ -38,7 +38,7 @@ export default function Homepage({timetables, user}) {
   return (
     // add a loading screen for fetching data
     
-    <Dashboard eventChannel={eventChannel} timetables = {timetables} refreshData={refreshData} user={user}>
+    <Dashboard eventChannel={eventChannel} timetables = {timetables} sharedTimetables={sharedTimetables} refreshData={refreshData} user={user}>
     </Dashboard>
   )
 }
@@ -46,40 +46,44 @@ export default function Homepage({timetables, user}) {
 export async function getServerSideProps({req, res}) {
   await middleware.run(req, res);
 
-  let timetable = [];
+  let timetable = {timetables: [], sharedTimetables: []};
+  let user = null;
 
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const baseUrl = req ? `${protocol}://${req.headers.host}` : '';
 
-  const response = await fetch(baseUrl + '/api/user', {
-    headers: {
-      cookie: req.headers.cookie
-    },
-    method: 'GET',
-    credentials: 'include'
-  });
-  let user;
-  if (response.status === 200) {
-    user = await response.json();
-
-    if (user.email){
-      const res = await fetch(baseUrl + '/api/timetables/' + user.email, {
-        headers: {
-          cookie: req.headers.cookie
-        },
-        method: 'GET',
-      });
-      if (res.status === 200) {
-        timetable = await res.json();
+  if (req.headers.cookie){
+    const response = await fetch(baseUrl + '/api/user/getuser', {
+      headers: {
+        cookie: req.headers.cookie
+      },
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (response.status === 200) {
+      user = await response.json();
+  
+      if (user.email){
+        const res = await fetch(baseUrl + '/api/timetables/' + user.email, {
+          headers: {
+            cookie: req.headers.cookie
+          },
+          method: 'GET',
+        });
+        if (res.status === 200) {
+          timetable = await res.json();
+        }
       }
+  
+    } else {
+      console.log(await response.text());
     }
-
-  } else {
-    console.log(await response.text());
   }
   return {
     props: {
-      timetables: timetable,
+      timetables: timetable.timetables,
+      sharedTimetables: timetable.sharedTimetables,
       user: user
     },
   };

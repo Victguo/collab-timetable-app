@@ -15,7 +15,6 @@ handler.post(async (req, res, next) => {
 
     req.db.collection('timetables').findOne({_id: ObjectId(tableID)}, function(err, timetable) {
         if (err) return res.status(500).end(err);
-        console.log(timetable);
         if (!timetable) return res.status(401).end("This timetable does not exist");
         req.db.collection('timetableInvites').findOne({tableID}, function(err, existingInvite) {
             if (err) return res.status(500).end(err);
@@ -24,7 +23,7 @@ handler.post(async (req, res, next) => {
             } else {
                 req.db.collection('timetableInvites').insertOne({tableID: tableID, owner: req.user.email}, function(err, timetableInvite) {
                     if (err) return res.status(500).end(err);
-                    return res.json(timetableInvite);
+                    return res.json(timetableInvite.ops[0]);
                 });
             }
         });

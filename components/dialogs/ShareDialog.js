@@ -34,7 +34,7 @@ export default function ShareDialog({tableName, tableID, refreshData}) {
       if (res.status === 200) {
         timetableInvite = await res.json();
         setShareLink(baseUrl + "invite/" + timetableInvite._id);
-        refreshData();      
+        // refreshData();      
   
       } else {
         // some kinda error?
@@ -43,16 +43,9 @@ export default function ShareDialog({tableName, tableID, refreshData}) {
       }
   };
 
-  const handleClose = (submit) => {
+  const handleClose = () => {
     setOpen(false);
-    // // if the user chose to delete the timetable
-    // if (submit){
-    //   deleteTimetable();
-    // }
   };
-
-  const deleteTimetable = async() => {
-  }
 
   return (
     <div>
