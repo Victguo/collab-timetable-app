@@ -26,6 +26,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import DeleteEventDialog from '../components/dialogs/DeleteEventDialog';
 import EventDialog from '../components/dialogs/EventDialog';
 import CustomWeekView from '../components/calendar/CustomWeekView';
+import Cookies from 'js-cookie';
 
 const localizer = momentLocalizer(moment);
 
@@ -452,16 +453,23 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   }
 
   const handleLogout = async () => {
-    const res = await fetch('/api/user/signout', {
-      method: 'GET',
+    const res = await fetch('/api/graphql', {
+      method: 'POST',
       credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          mutation {
+            signout
+          }
+        `
+      }),
     });
-    if (res.status === 200) {
-      console.log("logging out");
+    const data = await res.json();
+    if(!data.errors) {
       Router.replace('/');
-      
     } else {
-      console.log(await res.text())
+      console.log(data.errors.message[0]);
     }
   }
 

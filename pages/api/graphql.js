@@ -84,6 +84,7 @@ const typeDefs = gql`
     type Mutation {
         register(email: String!, password: String!): Token
         login(email: String!, password: String!): Token
+        signout: Boolean
         createTimetable(title: String!): Timetable
         deleteTimetable(tableID: String!): Timetable
         createInvite(tableID: String!): Invite
@@ -212,7 +213,20 @@ const resolvers = {
             });
             return {value: token};
         },
-
+        async signout(_parent, _args, _context) {
+            if(_context.user && _context.user.id) {
+                _context.cookies.set("auth-token", '', {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    path: "/",
+                    maxAge: 60 * 60 * 60 * 24 * 7,
+                    
+                });
+                return true;
+            } else {
+                return false;
+            }
+        },
         async createTimetable(_parent, { title }, _context) {
             
             if(_context.user && _context.user.id) {
