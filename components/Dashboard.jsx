@@ -152,7 +152,8 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   useEffect(() => {
     eventChannel.bind('event-change', (results) => {
       
-      let accessToTable = timetables.find( timetable => timetable['_id'] === results.tableID );
+      let accessToTable = sharedTimetables.find( timetable => timetable['_id'] === results.tableID );
+      console.log(results.user);
 
       // check if user is the owner or has access to the table
       if (results.user == user.email || accessToTable) {
@@ -241,7 +242,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
             start: inputs.startDate,
             end: inputs.endDate,
             description: inputs.eventDescription,
-            sharedTimetables: sharedTimetables.map(({title, userID, events}) => ({title, userID, events})),
+            sharedTimetables: sharedTimetables,
         }
       }),
     });
@@ -288,7 +289,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
         variables: {
           tableID: currTimetable,
           event: event,
-          sharedTimetables: sharedTimetables.map(({title, userID, events}) => ({title, userID, events})),
+          sharedTimetables: sharedTimetables,
         }
       }),
     });
@@ -346,7 +347,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
           tableID: currTimetable,
           oldEvent: oldEvent,
           newEvent: newEvent,
-          sharedTimetables: sharedTimetables.map(({title, userID, events}) => ({title, userID, events})),
+          sharedTimetables: sharedTimetables,
         }
       }),
     });
@@ -547,7 +548,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Dashboard
+            {user.email ? user.email : "Dashboard"}
           </Typography>
           {!user.email ? (
             <>

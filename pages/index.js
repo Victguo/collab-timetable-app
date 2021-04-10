@@ -25,9 +25,10 @@ export default function Homepage({timetables, sharedTimetables, user}) {
 
   useEffect(() => {
     timetableChannel.bind('timetable-change', updateUser => {
-      // check if the user is the currently signed in one
-      //      need to add in if the user is shared with the timetable too
-      if (user.email == updateUser){
+      
+      const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
+      // check if the user is the currently signed in one or is shared with the timetable 
+      if (user.email == updateUser || sharedWithUser){
         
         refreshData();
       }

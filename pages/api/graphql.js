@@ -38,6 +38,7 @@ const typeDefs = gql`
     }
 
     input TimetableInput {
+        _id: ID
         title: String
         userID: String
         events: [EventInput]
@@ -103,7 +104,6 @@ const resolvers = {
                 .collection('users')
                 .findOne({_id: ObjectID(_context.user.id)})
                 .then((data) => {
-                    console.log(data);
                     return data
                 });
             } else {
@@ -292,7 +292,6 @@ const resolvers = {
                 .then((data) => {
                     return data;
                 });
-                console.log(user);
                 const table = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
                 if (!table) throw new Error("Timetable does not exist");
                 const timetableInvite = await _context.db.collection('timetableInvites').findOne({tableID});
@@ -359,7 +358,7 @@ const resolvers = {
                         description: description
                     }
                     const result = await _context.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$push: {events: event}});
-                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
+                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: timetable.userID});
     
                     return result;                
                 }
@@ -392,8 +391,9 @@ const resolvers = {
             
                 // check to see if signed in user is timetable owner or has been shared with
                 if (timetable.userID == user.email || sharedWithUser) {
+                    
                     const result = await _context.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
-                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
+                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: timetable.userID});
             
                     return result;
                 }
@@ -426,7 +426,7 @@ const resolvers = {
 
                 if (timetable.userID == user.email || sharedWithUser) {
                     const result = await _context.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID), "events.title": oldEvent.title, "events.start": oldEvent.start, "events.end": oldEvent.end, "events.description": oldEvent.description}, {$set: {"events.$": newEvent}});
-                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
+                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: timetable.userID});
     
                     return result;                
                 }
