@@ -156,6 +156,8 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       // check if user is the owner or has access to the table
       if (results.user == user.email || accessToTable) {
         refreshEvents(results.tableID);
+        refreshData();
+
       }
 
     })
@@ -215,12 +217,13 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
         title: inputs.eventName,
         start: inputs.startDate,
         end: inputs.endDate,
-        description: inputs.eventDescription
+        description: inputs.eventDescription,
+        sharedTimetables: sharedTimetables
       }),
     });
     if (res.status === 200) {
 
-      refreshEvents();
+      refreshData();
 
     } else {
       // some kinda error?
@@ -243,12 +246,14 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         tableID: currTimetable,
-        event: event
+        event: event,
+        sharedTimetables
       }),
     });
     if (res.status === 200) {
 
       refreshEvents();
+      refreshData();
 
     } else {
       // some kinda error?
@@ -279,12 +284,14 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       body: JSON.stringify({
         tableID: currTimetable,
         oldEvent: oldEvent,
-        newEvent: newEvent
+        newEvent: newEvent,
+        sharedTimetables: sharedTimetables
       }),
     });
     if (res.status === 200) {
 
       refreshEvents();
+      refreshData();
 
     } else {
       // some kinda error?

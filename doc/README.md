@@ -36,6 +36,7 @@ $ curl --request POST \
       - end: (date) the end date of the event
       - description: (string) a description of the event
       - email: (string) the email of current signed in user
+      - sharedTimetables: (array) list of sharedTimetables the user has access to
 - response: 200
     - content-type: `application/json`
     - body: object
@@ -117,26 +118,57 @@ $ curl --request GET \
   
 ### Delete
   
-- description: delete the comment id
-- request: `DELETE /api/comments/:id/`
+- description: delete a timetable
+- request: `DELETE /api/timetables/`
+    - content-type: `application/json`
+    - body: (string) the tableID of the timetable to be deleted
 - response: 200
     - content-type: `application/json`
-    - body: (int) the number of comments deleted (0 if the message didnt exist)
+    - body: (object) the timetable that got deleted
 
-``` 
-$ curl -X DELETE
-       http://localhost:3000/api/comments/jed5672jd90xg4awo789/
-``` 
 
-- description: delete the image id
-- request: `DELETE /api/images/:id/`
+$ curl --request DELETE \
+  --url http://localhost:3000/timetables/ \
+  --header 'Content-Type: application/json' \
+  --data '{"tableID":"6054fa7272e6c83458348bf3"}
+'
+```
+
+- description: delete an event
+- request: `DELETE /api/events/`
+    - content-type: `application/json`
+    - body: object
+      - tableID: (string) the tableID of the table the event belongs to
+      - event: (object) the event to be deleted
+      - sharedTimetables: (array) list of sharedTimetables the user has access to
 - response: 200
     - content-type: `application/json`
-    - body: (int) the number of images deleted (0 if the image didnt exist)
+    - body: (object) the timetable the event got deleted from
 
-``` 
-$ curl -X DELETE
-       http://localhost:3000/api/images/l4CpGUiCV43W73l0/
-``` 
+
+$ curl --request DELETE \
+  --url http://localhost:3000/events/ \
+  --header 'Content-Type: application/json' \
+  --data '{"tableID":"6054fa7272e6c83458348bf3", "event": {"start":"2021-04-09T04:00:00.000Z", "end":"2021-04-09T04:00:00.000Z", "title":"test", "description": "test"}, "sharedTimetables": []}'
+```
 
 ### Patch
+
+- description: update an event
+- request: `PATCH /api/events/`
+    - content-type: `application/json`
+    - body: object
+      - tableID: (string) the tableID of the table the event belongs to
+      - oldEvent: (object) the event before changes
+      - newEvent: (object) the event after changes
+      - sharedTimetables: (array) list of sharedTimetables the user has access to
+- response: 200
+    - content-type: `application/json`
+    - body: (object) the timetable the event got updated from
+
+$ curl --request PATCH \
+  --url http://localhost:3000/events/ \
+  --header 'Content-Type: application/json' \
+  --data '{"tableID":"6054fa7272e6c83458348bf3", "oldEvent": {"start":"2021-04-09T04:00:00.000Z", "end":"2021-04-09T04:00:00.000Z", "title":"test", "description": "test"},
+  "newEvent": {"start":"2021-04-09T04:00:00.000Z", "end":"2021-04-09T04:00:00.000Z", "title":"testss", "description": "testing"}, "sharedTimetables": []}'
+```
