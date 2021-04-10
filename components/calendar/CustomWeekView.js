@@ -42,7 +42,7 @@ CustomWeekView.navigate = (date, action) => {
 }
 
 CustomWeekView.title = date => {
-  return `My awesome week: ${date.toLocaleDateString()}`
+  return `Week of: ${date.toLocaleDateString()}`
 }
 
 export default CustomWeekView
