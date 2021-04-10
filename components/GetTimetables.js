@@ -65,17 +65,13 @@ export default function GetTimetables({setTimetable, currTimetable, timetables, 
         selected={currTimetable === table._id} 
         onClick={(event) => handleListItemClick(event, table._id, table.events)}
       >
-        <Tooltip>
-          <IconButton disabled >
-              <DeleteIcon/>
-          </IconButton>
-        </Tooltip>
-        <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
-        <Tooltip >
-            <IconButton disabled>
-                <ShareIcon/>
-            </IconButton>
-        </Tooltip>
+      <IconButton disabled >
+          <DeleteIcon/>
+      </IconButton>
+      <ListItemText primary={table.title} classes={{primary:classes.test}} className={classes.inline}/>
+      <IconButton disabled>
+          <ShareIcon/>
+      </IconButton>
       </ListItem>
     ))}
   </List>);
