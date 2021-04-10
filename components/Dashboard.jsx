@@ -353,7 +353,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       body: JSON.stringify({
         query: `
           {
-            events(tableID: ${timetable}) {
+            events(tableID: "${timetable}") {
               title
               tableID
               start
@@ -365,9 +365,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       }),
     });
     const data = await res.json();
-    console.log(data);
     if (!data.errors) {
-      console.log(data);
       let returnedEvents = data.data.events;
 
       // convert all the date strings back into a date object
