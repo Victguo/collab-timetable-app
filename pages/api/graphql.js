@@ -162,7 +162,7 @@ const resolvers = {
             return {value: token};
         },
 
-        async createTimetable(_parent, { title, email }, _context) {
+        async createTimetable(_parent, { title}, _context) {
             
             if(_context.user && _context.user.id) {
                 let timetable = {
@@ -170,11 +170,15 @@ const resolvers = {
                     userID: email,
                     events: []
                 }
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
                 const timetableDoc = await _context.db.collection('timetables').insertOne(timetable).then(({ops}) => {
-                    _context.db.collection('users').updateOne({email: email},{ $addToSet: {timetables : ops[0]._id }},
+                    _context.db.collection('users').updateOne({email: user.email},{ $addToSet: {timetables : ops[0]._id }},
                         function(err, updatedUser) {
                             // if (err) return res.status(500).end(err);
-                            pusher.trigger('timetable-channel', 'timetable-change', updatedUser.email);
+                            pusher.trigger('timetable-channel', 'timetable-change', user.email);
                     });
 
                     return ops[0];
