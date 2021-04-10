@@ -320,25 +320,44 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       title: selectedEvent.title,
       description: selectedEvent.description
     }
-
-    const res = await fetch('/api/events', {
-      method: 'PATCH',
+    const res = await fetch('/api/graphql', {
+      method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tableID: currTimetable,
-        oldEvent: oldEvent,
-        newEvent: newEvent,
-        sharedTimetables: sharedTimetables
+        query: `
+          mutation updateEvent(
+            $tableID: String!,
+            $oldEvent: EventInput
+            $newEvent: EventInput
+            $sharedTimetables: [TimetableInput]) {
+            updateEvent(
+              tableID: $tableID
+              oldEvent: $oldEvent
+              newEvent: $newEvent
+              sharedTimetables: $sharedTimetables
+            ) {
+              _id
+            }
+          }
+        `,
+        variables: {
+          tableID: currTimetable,
+          oldEvent: oldEvent,
+          newEvent: newEvent,
+          sharedTimetables: sharedTimetables.map(({title, userID, events}) => ({title, userID, events})),
+        }
       }),
     });
-    if (res.status === 200) {
+    const data = await res.json();
+    if (!data.errors) {
 
       refreshEvents();
       refreshData();
 
     } else {
       // some kinda error?
-
+      console.log(data.errors.message[0]);
       // make an alert saying something went wrong
     }
   }

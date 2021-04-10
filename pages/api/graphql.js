@@ -90,6 +90,7 @@ const typeDefs = gql`
         inviteUser(inviteID: String!): Boolean
         createEvent(tableID: String!, title: String!, start: Date!, end: Date!, description: String, sharedTimetables: [TimetableInput]): Timetable
         deleteEvent(tableID: String!, event: EventInput, sharedTimetables: [TimetableInput]): Timetable
+        updateEvent(tableID: String!, oldEvent: EventInput, newEvent: EventInput, sharedTimetables: [TimetableInput]): Timetable
     }
 `
 
@@ -386,6 +387,39 @@ const resolvers = {
                     throw new Error("access denied");
             
                 }
+            } else {
+                return null;
+            }
+        },
+        async updateEvent(_parent, { tableID, oldEvent, newEvent, sharedTimetables }, _context) {
+            if(_context.user && _context.user.id) {
+
+                if (!tableID || !oldEvent || !newEvent){
+                    throw new Error("Missing input");
+                }
+
+                const timetable = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
+
+                if (!timetable) {
+                    throw new Error("timetable does not exist or has been deleted");
+                }
+
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+
+                if (timetable.userID == user.email || sharedWithUser) {
+                    const result = await _context.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID), "events.title": oldEvent.title, "events.start": oldEvent.start, "events.end": oldEvent.end, "events.description": oldEvent.description}, {$set: {"events.$": newEvent}});
+                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
+    
+                    return result;                
+                }
+                else {
+                    throw new Error("access denied")
+                }
+
             } else {
                 return null;
             }
