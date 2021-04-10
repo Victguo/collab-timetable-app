@@ -15,6 +15,7 @@ handler.post(async (req, res, next) => {
     const end = req.body.end;
     const description = req.body.description;
     const user = req.user.email;
+    const sharedTimetables = req.body.sharedTimetables;
 
     if (!title) {
         return res.status(400).send("Please enter an event title");
@@ -27,16 +28,15 @@ handler.post(async (req, res, next) => {
     }
 
     const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+    const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
 
     if (!timetable) {
         res.status(404).send("timetable does not exist or has been deleted");
     }
-    
-    // check to see if signed in user is timetable owner
-    if (timetable.userID != user) {
-        res.status(401).send("access denied");
-    }
-    else {
+
+    // check to see if signed in user is timetable owner or has been shared with
+    if (timetable.userID == user || sharedWithUser) {
+
         let event = {
             title: title,
             tableID: tableID,
@@ -50,6 +50,10 @@ handler.post(async (req, res, next) => {
 
         return res.json({result});
     }
+    else {
+        res.status(401).send("access denied");
+
+    }
 });
 
 handler.delete(async (req, res) => {
@@ -58,26 +62,29 @@ handler.delete(async (req, res) => {
     const tableID = req.body.tableID;
     const event = req.body.event;
     const user = req.user.email;
+    const sharedTimetables = req.body.sharedTimetables;
 
     if (!tableID || !event){
         return res.status(400).send("Missing input");
     }
 
     const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
-    
+    const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
+
     if (!timetable) {
         res.status(404).send("timetable does not exist or has been deleted");
     }
 
-    // check to see if signed in user is timetable owner
-    if (timetable.userID != user) {
-        res.status(401).end("access denied");
-    }
-    else {
+    // check to see if signed in user is timetable owner or has been shared with
+    if (timetable.userID == user || sharedWithUser) {
         const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
         pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user});
 
         return res.json(result);
+    }
+    else {
+        res.status(401).end("access denied");
+
     }
 })
 
@@ -88,26 +95,28 @@ handler.patch(async (req, res) => {
     const oldEvent = req.body.oldEvent;
     const newEvent = req.body.newEvent;
     const user = req.user.email;
+    const sharedTimetables = req.body.sharedTimetables;
 
     if (!tableID || !oldEvent || !newEvent){
         return res.status(400).send("Missing input");
     }
 
     const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+    const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
 
     if (!timetable) {
         res.status(404).send("timetable does not exist or has been deleted");
     }
 
     // check to see if signed in user is timetable owner
-    if (timetable.userID != user) {
-        res.status(401).end("access denied");
-    }
-    else {
+    if (timetable.userID == user || sharedWithUser) {
         const result = await req.db.collection('timetables').updateOne({_id: ObjectID(tableID), "events.title": oldEvent.title, "events.start": oldEvent.start, "events.end": oldEvent.end, "events.description": oldEvent.description}, {$set: {"events.$": newEvent}});
         pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user});
 
         return res.json(result);
+    }
+    else {
+        res.status(401).end("access denied");
     }
 })
 
