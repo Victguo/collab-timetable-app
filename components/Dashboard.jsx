@@ -153,7 +153,6 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
     eventChannel.bind('event-change', (results) => {
       
       let accessToTable = sharedTimetables.find( timetable => timetable['_id'] === results.tableID );
-      console.log(results.user);
 
       // check if user is the owner or has access to the table
       if (results.user == user.email || accessToTable) {
@@ -294,7 +293,6 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       }),
     });
     const data = await res.json();
-    console.log(data);
     if (!data.errors) {
 
       refreshEvents();
@@ -365,8 +363,6 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   }
 
   const refreshEvents = async(timetable = currTimetable) => {
-    console.log("id");
-    console.log(timetable);
     const res = await fetch('/api/graphql', {
       method: 'POST',
       credentials: 'same-origin',
@@ -403,24 +399,26 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   const [start, setStart] = React.useState(null);
   const [end, setEnd] = React.useState(null);
 
-  const handleSelectedSlot = (mouseX, mouseY, start, end) => {
-    setStart(start);
-    setEnd(end);
-    setSelectedSlot({
-      x: mouseX,
-      y: mouseY,
-      open: true,
-    });
-  };
   const handleSlotSelect = (slotInfo) => {
+
+    setStart(slotInfo.start);
+    setEnd(slotInfo.end);
 
     // clicked on one day
     if (slotInfo.box) {
-      handleSelectedSlot(slotInfo.box.x, slotInfo.box.y, slotInfo.start, slotInfo.end);
+      setSelectedSlot({
+        x: slotInfo.box.x,
+        y: slotInfo.box.y,
+        open: true,
+      });
     } 
     // clicked on more than one day
     else if (slotInfo.bounds) {
-      handleSelectedSlot(slotInfo.bounds.x, slotInfo.bounds.y, slotInfo.start, slotInfo.end);
+      setSelectedSlot({
+        x: slotInfo.bounds.x,
+        y: slotInfo.bounds.y,
+        open: true,
+      });
     }
 
   };

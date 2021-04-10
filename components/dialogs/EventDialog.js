@@ -3,7 +3,7 @@
 // - autofill date of selected slot when creating new event
 
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -27,29 +27,6 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
   const [invalidName, setInvalidName] = React.useState(false);
   const [invalidDate, setInvalidDate] = React.useState(false);
 
-  // set start and end dates based on user selection
-  if (!startDate && start){
-    setStartDate(start);
-  }
-  if (!endDate && end){
-    setEndDate(end);
-  }
-
-  // if the user is editing an existing event and opened the dialog
-  if (type == "edit" && open){
-    if (!startDate && selectedEvent.start){
-      setStartDate(selectedEvent.start);
-    }
-    if (!endDate && selectedEvent.end){
-      setEndDate(selectedEvent.end);
-    }
-    if (!eventName && selectedEvent.title){
-      setEventName(selectedEvent.title);
-    }
-    if (!eventDescription && selectedEvent.description){
-      setEventDescription(selectedEvent.description);
-    }
-  }
 
   const handleEventNameChange = (name) => {
     setEventName(name.target.value);
@@ -74,6 +51,29 @@ export default function EventDialog({selectedEvent, type, open, handleCloseDialo
     setEndDate(null);
     setInvalidName(false);
     setInvalidDate(false);
+  }
+
+  // if the user clicked on existing event set the info
+  if (selectedEvent.start && !open){
+    if (selectedEvent.start && startDate != selectedEvent.start){
+      setStartDate(selectedEvent.start);
+    }
+    if (selectedEvent.end && endDate != selectedEvent.end){
+      setEndDate(selectedEvent.end);
+    }
+    if (selectedEvent.title && eventName != selectedEvent.title){
+      setEventName(selectedEvent.title);
+    }
+    if (selectedEvent.description && eventDescription != selectedEvent.description){
+      setEventDescription(selectedEvent.description);
+    }
+  } 
+  // otherwise set start and end dates based on user clicking on slot in calendar
+  else if (start && startDate != start && end && endDate != end && !open){
+    setStartDate(start);
+    setEndDate(end);
+    setEventName("");
+    setEventDescription("");
   }
 
   const validateInput = (submit) => {
