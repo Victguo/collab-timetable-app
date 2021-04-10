@@ -77,6 +77,7 @@ const typeDefs = gql`
     type Query {
         user: User
         timetables: [Timetable]
+        sharedTimetables: [Timetable]
         events(tableID: String!): [Event]
     }
 
@@ -122,6 +123,21 @@ const resolvers = {
             }
             
         },
+        
+        async sharedTimetables(_parent, _args, _context, _info) {
+            if(_context.user && _context.user.id) {
+                const user = await _context.db.collection('users')
+                .findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+                const timetableArray = await _context.db.collection('timetables').find({_id: {$in: user.sharedTimetables}}).sort({_id: -1}).toArray();
+                return timetableArray;
+            } else {
+                return null;
+            }
+        },
+
         async events(_parent, {tableID}, _context, _info) {
 
             if(_context.user && _context.user.id) {
@@ -138,7 +154,7 @@ const resolvers = {
             } else {
                 return null;
             }
-        }
+        },
     },
     Mutation: {
 
