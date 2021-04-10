@@ -363,7 +363,7 @@ const resolvers = {
                     throw new Error("Missing input");
                 }
             
-                const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                const timetable = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
                 const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
             
                 if (!timetable) {
@@ -377,7 +377,7 @@ const resolvers = {
             
                 // check to see if signed in user is timetable owner or has been shared with
                 if (timetable.userID == user.email || sharedWithUser) {
-                    const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
+                    const result = await _context.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
                     pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
             
                     return result;

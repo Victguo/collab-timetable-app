@@ -215,19 +215,33 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: `
-          mutation {
+          mutation createEvent(
+            $tableID: String!,
+            $title: String!,
+            $start: Date!,
+            $end: Date!,
+            $description: String,
+            $sharedTimetables: [TimetableInput]) {
             createEvent(
-              tableID: "${currTimetable}"
-              title: "${inputs.eventName}"
-              start: "${inputs.startDate}"
-              end: "${inputs.endDate}"
-              description: "${inputs.eventDescription}"
-              sharedTimetables: "${sharedTimetables}"
+              tableID: $tableID
+              title: $title
+              start: $start
+              end: $end
+              description: $description
+              sharedTimetables: $sharedTimetables
             ) {
               _id
             }
           }
         `,
+        variables: {
+          tableID: currTimetable,
+            title: inputs.eventName,
+            start: inputs.startDate,
+            end: inputs.endDate,
+            description: inputs.eventDescription,
+            sharedTimetables: sharedTimetables.map(({title, userID, events}) => ({title, userID, events})),
+        }
       }),
     });
     const data = await res.json();
@@ -251,23 +265,42 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       description: inputs.description
     }
 
-    const res = await fetch('/api/events', {
-      method: 'DELETE',
+    const res = await fetch('/api/graphql', {
+      method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tableID: currTimetable,
-        event: event,
-        sharedTimetables
+        query: `
+          mutation deleteEvent(
+            $tableID: String!,
+            $event: EventInput
+            $sharedTimetables: [TimetableInput]) {
+            deleteEvent(
+              tableID: $tableID
+              event: $event
+              sharedTimetables: $sharedTimetables
+            ) {
+              _id
+            }
+          }
+        `,
+        variables: {
+          tableID: currTimetable,
+          event: event,
+          sharedTimetables: sharedTimetables.map(({title, userID, events}) => ({title, userID, events})),
+        }
       }),
     });
-    if (res.status === 200) {
+    const data = await res.json();
+    console.log(data);
+    if (!data.errors) {
 
       refreshEvents();
       refreshData();
 
     } else {
       // some kinda error?
-
+      console.log(data.errors.message[0]);
       // make an alert saying something went wrong
     }
   }
@@ -311,6 +344,8 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   }
 
   const refreshEvents = async(timetable = currTimetable) => {
+    console.log("id");
+    console.log(timetable);
     const res = await fetch('/api/graphql', {
       method: 'POST',
       credentials: 'same-origin',
@@ -318,7 +353,7 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
       body: JSON.stringify({
         query: `
           {
-            events {
+            events(tableID: ${timetable}) {
               title
               tableID
               start
@@ -329,15 +364,18 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
         `,
       }),
     });
-    const data = res.json();
+    const data = await res.json();
+    console.log(data);
     if (!data.errors) {
-
+      console.log(data);
       let returnedEvents = data.data.events;
 
       // convert all the date strings back into a date object
       let convertedEvents = returnedEvents.map(event => ({title: event.title, tableID: event.tableID, start: new Date(event.start), end: new Date(event.end), description: event.description}));
 
       setCurrTimetableEvents(convertedEvents);
+    } else {
+      console.log(data.errors[0].message);
     }
   }
 
