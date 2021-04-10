@@ -4,7 +4,7 @@
 import Dashboard from '../components/Dashboard'
 import { useRouter } from 'next/router';
 // import useSWR from 'swr';
-import middleware from '../middleware/index';
+
 import Pusher from 'pusher-js';
 import { useEffect } from 'react';
 
@@ -43,7 +43,7 @@ export default function Homepage({timetables, sharedTimetables, user}) {
 
 
 export async function getServerSideProps({req, res}) {
-  await middleware.run(req, res);
+
   let timetable = {timetables: [], sharedTimetables: []};
   let user = {};
   const protocol = req.headers['x-forwarded-proto'] || 'http';

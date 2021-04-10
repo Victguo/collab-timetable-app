@@ -1,4 +1,3 @@
-import middleware from '../../middleware/index';
 import { useRouter } from 'next/router';
 
 export default function InvitePage({invited}) {
@@ -15,7 +14,6 @@ export default function InvitePage({invited}) {
 }
 
 export async function getServerSideProps({req, res, query}) {
-  await middleware.run(req, res);
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const baseUrl = req ? `${protocol}://${req.headers.host}` : '';
   let invited = false;
