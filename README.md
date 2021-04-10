@@ -1,8 +1,12 @@
 # Project DiamondHands
+- deployed on https://team-diamondhands.vercel.app 
 
 ## Team members
 - Joe Liu
 - Victor Guo
+
+## API Documentation
+- Located at doc/schema/user.doc.html
 
 ## Description of Web Application
 - Interactive timetable planner and scheduler, where the users will able to collaborate with each other to plan events and coordinate schedules.
