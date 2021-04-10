@@ -25,14 +25,22 @@ export default function DeleteDialog({setTimetable, currTimetable, type, tableID
   };
 
   const deleteTimetable = async() => {
-    const res = await fetch('/api/timetables', {
-      method: 'DELETE',
+    const res = await fetch('/api/graphql', {
+      method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tableID: tableID,
+        query: `
+          mutation {
+            deleteTimetable(tableID: "${tableID}") {
+              _id
+            }
+          }
+        `,
       }),
     });
-    if (res.status === 200) {
+    const data = await res.json();
+    if (!data.errors) {
 
       // edge case of deleting currently selected timetable
       if (tableID == currTimetable) {

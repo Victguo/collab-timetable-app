@@ -48,16 +48,24 @@ export default function SignUpPage() {
     if (!body.password) {
       return setErrorMsg("Please enter a password");
     }
-    const res = await fetch('/api/user/signup', {
+    const res = await fetch('/api/graphql', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        query: `
+          mutation {
+            register(email: "${body.email}", password: "${body.password}") {
+              value
+            }
+          }
+        `,
+      }),
     });
-    if (res.status === 200) {
-      const userObj = await res.json();
+    const data = await res.json();
+    if (!data.errors) {
       emailjs.send('service_dfykjcc', 'template_sdlqg2a', {
-        to_email: userObj.email,
+        to_email: body.email,
       }).then((result) => {
           console.log(result.text);
       }, (error) => {
@@ -65,7 +73,7 @@ export default function SignUpPage() {
       });
       Router.replace('/');
     } else {
-      setErrorMsg(await res.text());
+      setErrorMsg(data.errors[0].message);
     }
   };
 

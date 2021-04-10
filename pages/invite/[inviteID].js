@@ -16,19 +16,31 @@ export default function InvitePage({invited}) {
 
 export async function getServerSideProps({req, res, query}) {
   await middleware.run(req, res);
+  const protocol = req.headers['x-forwarded-proto'] || 'http';
+  const baseUrl = req ? `${protocol}://${req.headers.host}` : '';
   let invited = false;
 
   if (query.inviteID){
-    const response = await fetch('http://localhost:3000/api/invite/' + query.inviteID, {
-      headers: {
-        cookie: req.headers.cookie
-      },
+    const response = await fetch(baseUrl + '/api/graphql', {
       method: 'POST',
-      credentials: 'include'
+      headers: {
+        cookie: req.headers.cookie,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        query: `
+          mutation {
+            inviteUser(
+              inviteID: "${query.inviteID}"
+            )
+          }
+        `,
+      }),
     });
-    if (response.status === 200) {
+    const data = await response.json();
+    if (!data.errors) {
       invited = true;
-
     } else {
       invited = false;
     }

@@ -209,25 +209,35 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   };
 
   const createEvent = async(inputs) => {
-    const res = await fetch('/api/events', {
+    const res = await fetch('/api/graphql', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tableID: currTimetable,
-        title: inputs.eventName,
-        start: inputs.startDate,
-        end: inputs.endDate,
-        description: inputs.eventDescription,
-        sharedTimetables: sharedTimetables
+        query: `
+          mutation {
+            createEvent(
+              tableID: "${currTimetable}"
+              title: "${inputs.eventName}"
+              start: "${inputs.startDate}"
+              end: "${inputs.endDate}"
+              description: "${inputs.eventDescription}"
+              sharedTimetables: "${sharedTimetables}"
+            ) {
+              _id
+            }
+          }
+        `,
       }),
     });
-    if (res.status === 200) {
+    const data = await res.json();
+    if (!data.errors) {
 
       refreshData();
 
     } else {
       // some kinda error?
-
+      console.log(data.errors[0].message);
       // make an alert saying something went wrong
     }
   }
@@ -301,12 +311,28 @@ export default function Dashboard({eventChannel, timetables, sharedTimetables, r
   }
 
   const refreshEvents = async(timetable = currTimetable) => {
-    const res = await fetch('/api/events/' + timetable, {
-      method: 'GET',
+    const res = await fetch('/api/graphql', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          {
+            events {
+              title
+              tableID
+              start
+              end
+              description
+            }
+          }
+        `,
+      }),
     });
-    if (res.status === 200) {
+    const data = res.json();
+    if (!data.errors) {
 
-      let returnedEvents = await res.json();
+      let returnedEvents = data.data.events;
 
       // convert all the date strings back into a date object
       let convertedEvents = returnedEvents.map(event => ({title: event.title, tableID: event.tableID, start: new Date(event.start), end: new Date(event.end), description: event.description}));

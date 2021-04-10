@@ -84,8 +84,8 @@ const typeDefs = gql`
     type Mutation {
         register(email: String!, password: String!): Token
         login(email: String!, password: String!): Token
-        createTimetable(email: String!, title: String!): Timetable
-        deleteTimetable(email: String!, tableID: String!): Timetable
+        createTimetable(title: String!): Timetable
+        deleteTimetable(tableID: String!): Timetable
         createInvite(tableID: String!): Invite
         inviteUser(inviteID: String!): Boolean
         createEvent(tableID: String!, title: String!, start: Date!, end: Date!, description: String, sharedTimetables: [TimetableInput]): Timetable
@@ -183,7 +183,7 @@ const resolvers = {
                 httpOnly: true,
                 sameSite: "lax",
                 path: "/",
-                maxAge: 60 * 60 * 24 * 7,
+                maxAge: 60 * 60 * 60 * 24 * 7,
                 sameSite: "lax"
             });
             return {value: token};
@@ -206,24 +206,25 @@ const resolvers = {
                 httpOnly: true,
                 sameSite: "lax",
                 path: "/",
-                maxAge: 60 * 60 * 24 * 7,
+                maxAge: 60 * 60 * 60 * 24 * 7,
                 
             });
             return {value: token};
         },
 
-        async createTimetable(_parent, { title}, _context) {
+        async createTimetable(_parent, { title }, _context) {
             
             if(_context.user && _context.user.id) {
-                let timetable = {
-                    title: title,
-                    userID: email,
-                    events: []
-                }
+                
                 const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
                 .then((data) => {
                     return data;
                 });
+                let timetable = {
+                    title: title,
+                    userID: user.email,
+                    events: []
+                }
                 const timetableDoc = await _context.db.collection('timetables').insertOne(timetable).then(({ops}) => {
                     _context.db.collection('users').updateOne({email: user.email},{ $addToSet: {timetables : ops[0]._id }},
                         function(err, updatedUser) {
@@ -239,12 +240,16 @@ const resolvers = {
             }
         },
 
-        async deleteTimetable(_parent, { tableID, email }, _context) {
+        async deleteTimetable(_parent, { tableID }, _context) {
             if(_context.user && _context.user.id) {
-                const table = _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+                const table = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
                 if (!table) throw new Error("Timetable does not exist");
 
-                if (table.userID != email){
+                if (table.userID != user.email){
                     // TODO: Should alert the user that only the owner can delete the timetable
                     return null;
                 } 
@@ -252,12 +257,12 @@ const resolvers = {
                 _context.db.collection('users').updateOne({ timetables: ObjectID(tableID) }, { $pull: { timetables: ObjectID(tableID)}},
                     function (err, userDocs) {
                         if (err) throw new Error(err);
-                        pusher.trigger('timetable-channel', 'timetable-change', email);
+                        pusher.trigger('timetable-channel', 'timetable-change', user.email);
                     });
                 _context.db.collection('users').updateMany({ sharedTimetables: ObjectID(tableID) }, { $pull: { sharedTimetables: ObjectID(tableID)}},
                     function (err, userDocs) {
                         if (err) throw new Error(err);
-                        pusher.trigger('timetable-channel', 'timetable-change', email);
+                        pusher.trigger('timetable-channel', 'timetable-change', user.email);
                     });
                 
                 return table;

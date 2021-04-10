@@ -32,20 +32,26 @@ export default function NewTimetableDialog({refreshData, user}) {
   };
 
   const insertTimetable = async() => {
-    const res = await fetch('/api/timetables', {
+    const res = await fetch('/api/graphql', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: title,
-        userID: user.email
+        query: `
+          mutation {
+            createTimetable(title: "${title}") {
+              _id
+            }
+          }
+        `,
       }),
     });
-    if (res.status === 200) {
-
+    const data = await res.json();
+    if (!data.errors) {
       refreshData();
 
     } else {
-      // some kinda error?
+      console.log(data.errors[0].message);
     }
   }
 

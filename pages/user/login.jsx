@@ -47,16 +47,25 @@ export default function SignIn() {
     if (!body.password) {
       return setErrorMsg("Please enter a password");
     }
-    const res = await fetch('/api/user/signin', {
+    const res = await fetch('/api/graphql', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        query: `
+          mutation {
+            login(email: "${body.email}", password: "${body.password}") {
+              value
+            }
+          }
+        `,
+      }),
     });
-    if (res.status === 200) {
+    const data = await res.json();
+    if (!data.errors) {
       Router.replace('/');
     } else {
-      setErrorMsg(await res.text());
+      setErrorMsg(data.errors[0].message);
     }
   };
   return (

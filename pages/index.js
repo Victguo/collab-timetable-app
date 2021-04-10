@@ -17,7 +17,6 @@ const timetableChannel = pusher.subscribe('timetable-channel');
 const eventChannel = pusher.subscribe('event-channel');
 
 export default function Homepage({timetables, sharedTimetables, user}) {
-
   const router = useRouter();
 
   const refreshData = () => {
@@ -37,47 +36,110 @@ export default function Homepage({timetables, sharedTimetables, user}) {
 
   return (
     // add a loading screen for fetching data
-    
-    <Dashboard eventChannel={eventChannel} timetables = {timetables} sharedTimetables={sharedTimetables} refreshData={refreshData} user={user}>
-    </Dashboard>
+      <Dashboard eventChannel={eventChannel} timetables = {timetables} sharedTimetables={sharedTimetables} refreshData={refreshData} user={user}>
+      </Dashboard>
   )
 }
 
+
 export async function getServerSideProps({req, res}) {
   await middleware.run(req, res);
-
   let timetable = {timetables: [], sharedTimetables: []};
-  let user = null;
-
+  let user = {};
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const baseUrl = req ? `${protocol}://${req.headers.host}` : '';
 
   if (req.headers.cookie){
-    const response = await fetch(baseUrl + '/api/user/getuser', {
+    const response = await fetch(baseUrl + '/api/graphql', {
+      method: 'POST',
       headers: {
-        cookie: req.headers.cookie
+        cookie: req.headers.cookie,
+        'Content-Type': 'application/json'
       },
-      method: 'GET',
-      credentials: 'include'
+      credentials: 'include',
+      body: JSON.stringify({
+        query: `
+          {
+            user {
+              email
+              timetables
+              sharedTimetables
+            }
+          }
+        `,
+      }),
     });
-    
-    if (response.status === 200) {
-      user = await response.json();
-  
-      if (user.email){
-        const res = await fetch(baseUrl + '/api/timetables/' + user.email, {
-          headers: {
-            cookie: req.headers.cookie
-          },
-          method: 'GET',
-        });
-        if (res.status === 200) {
-          timetable = await res.json();
-        }
-      }
-  
+
+    const data = await response.json();
+    user = data?.data?.user;
+
+    if (!user) {
+      user = {}
     } else {
-      console.log(await response.text());
+      if (!data.errors) {    
+        const timetableRes = await fetch(baseUrl + '/api/graphql', {
+          method: 'POST',
+          headers: {
+            cookie: req.headers.cookie,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            query: `
+            {
+              timetables {
+                _id
+                title
+                userID
+                events {
+                  title
+                  tableID
+                  start
+                  end
+                  description
+                }
+              }
+            }
+            `,
+          }),
+        });
+        const timetableData = await timetableRes.json();
+        if (!timetableData.errors) {
+          timetable.timetables = timetableData.data.timetables;
+        }
+        const sharedTimetableRes = await fetch(baseUrl + '/api/graphql', {
+          method: 'POST',
+          headers: {
+            cookie: req.headers.cookie,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            query: `
+            {
+              sharedTimetables {
+                _id
+                title
+                userID
+                events {
+                  title
+                  tableID
+                  start
+                  end
+                  description
+                }
+              }
+            }
+            `,
+          }),
+        });
+        const sharedTimetableData = await sharedTimetableRes.json();
+        if (!sharedTimetableData.errors) {
+          timetable.sharedTimetables = sharedTimetableData.data.sharedTimetables;
+        }
+      } else {
+        console.log(data.errors[0].message);
+      }
     }
   }
   return {

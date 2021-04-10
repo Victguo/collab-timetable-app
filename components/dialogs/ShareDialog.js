@@ -23,24 +23,28 @@ export default function ShareDialog({tableName, tableID, refreshData}) {
   const handleClickOpen = async () => {
     setOpen(true);
     
-    const res = await fetch('/api/invite/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tableID: tableID,
-        }),
-      });
-      let timetableInvite;
-      if (res.status === 200) {
-        timetableInvite = await res.json();
-        setShareLink(baseUrl + "invite/" + timetableInvite._id);
-        // refreshData();      
-  
-      } else {
-        // some kinda error?
-  
-        // make an alert saying something went wrong
-      }
+    const res = await fetch('/api/graphql', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          mutation {
+            createInvite(tableID: "${tableID}") {
+              _id
+            }
+          }
+        `,
+      }),
+    });
+    const data = await res.json();
+    if (!data.errors) {
+      setShareLink(baseUrl + "invite/" + data.data.createInvite._id);
+    } else {
+      // some kinda error?
+
+      // make an alert saying something went wrong
+    }
   };
 
   const handleClose = () => {
