@@ -29,6 +29,20 @@ const typeDefs = gql`
 
     scalar Date
 
+    input EventInput {
+        title: String
+        tableID: String
+        start: Date
+        end: Date
+        description: String
+    }
+
+    input TimetableInput {
+        title: String
+        userID: String
+        events: [EventInput]
+    }
+
     type User {
         _id: ID
         email: String
@@ -63,6 +77,7 @@ const typeDefs = gql`
     type Query {
         user: User
         timetables: [Timetable]
+        events(tableID: String!): [Event]
     }
 
     type Mutation {
@@ -72,6 +87,8 @@ const typeDefs = gql`
         deleteTimetable(email: String!, tableID: String!): Timetable
         createInvite(tableID: String!): Invite
         inviteUser(inviteID: String!): Boolean
+        createEvent(tableID: String!, title: String!, start: Date!, end: Date!, description: String, sharedTimetables: [TimetableInput]): Timetable
+        deleteEvent(tableID: String!, event: EventInput, sharedTimetables: [TimetableInput]): Timetable
     }
 `
 
@@ -105,6 +122,23 @@ const resolvers = {
             }
             
         },
+        async events(_parent, {tableID}, _context, _info) {
+
+            if(_context.user && _context.user.id) {
+
+                const timetable = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+            
+                if (!timetable) {
+                    throw new Error("Timetable not found");
+                }
+                else {
+                    return timetable.events;
+                }
+
+            } else {
+                return null;
+            }
+        }
     },
     Mutation: {
 
@@ -247,6 +281,88 @@ const resolvers = {
                         { $addToSet: {sharedTimetables : ObjectId(timetableInvite.tableID) }});
                     return !!updatedUser;
                 }
+            }
+        },
+
+        async createEvent(_parent, {tableID, title, start, end, description, sharedTimetables}, _context) {
+            if(_context.user && _context.user.id) {
+
+                if (!title) {
+                    throw new Error("Please enter an event title");
+                }
+                if (!tableID) {
+                    throw new Error("Please select a timetable for this event");
+                }
+                if (!start || !end) {
+                    throw new Error("Please enter a date");
+
+                }
+
+                const timetable = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
+
+                if (!timetable) {
+                    throw new Error("timetable does not exist or has been deleted");
+                }
+
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+
+                if (timetable.userID == user.email || sharedWithUser) {
+                    let event = {
+                        title: title,
+                        tableID: tableID,
+                        start: start,
+                        end: end,
+                        description: description
+                    }
+                    const result = await _context.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$push: {events: event}});
+                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
+    
+                    return result;                
+                }
+                else {
+                    throw new Error("access denied")
+                }
+
+            } else {
+                return null;
+            }
+        },
+        async deleteEvent(_parent, {tableID, event, sharedTimetables}, _context) {
+            if(_context.user && _context.user.id) {
+
+                if (!tableID || !event){
+                    throw new Error("Missing input");
+                }
+            
+                const timetable = await req.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                const sharedWithUser = (sharedTimetables.find(timetable => timetable._id == tableID) != null);
+            
+                if (!timetable) {
+                    throw new Error("timetable does not exist or has been deleted");
+                }
+
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+            
+                // check to see if signed in user is timetable owner or has been shared with
+                if (timetable.userID == user.email || sharedWithUser) {
+                    const result = await req.db.collection('timetables').findOneAndUpdate({_id: ObjectID(tableID)}, {$pull: {events: event}} );
+                    pusher.trigger('event-channel', 'event-change', {tableID: tableID, user: user.email});
+            
+                    return result;
+                }
+                else {
+                    throw new Error("access denied");
+            
+                }
+            } else {
+                return null;
             }
         }
     },
