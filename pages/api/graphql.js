@@ -2,11 +2,12 @@ import { ApolloServer, gql } from 'apollo-server-micro'
 import { makeExecutableSchema } from 'graphql-tools'
 import { MongoClient } from 'mongodb'
 import { GraphQLScalarType, Kind } from 'graphql';
-import { ObjectID } from 'bson';
+import { ObjectId, ObjectID } from 'bson';
 import isEmail from 'validator/lib/isEmail';
 import jwt from "jsonwebtoken";
 import Cookies from "cookies";
 import { generateHash, generateSalt } from '../../utils/auth';
+import { pusher } from '../../middleware/index';
 
 const { MONGODB_URI, MONGODB_DB } = process.env
 
@@ -34,6 +35,7 @@ const typeDefs = gql`
         password: String
         salt: String
         timetables: [String]
+        sharedTimetables: [String]
     }
     type Token {
         value: String
@@ -41,7 +43,7 @@ const typeDefs = gql`
     type Timetable {
         _id: ID
         title: String
-        owner: String
+        userID: String
         events: [Event]
     }
     type Event {
@@ -53,7 +55,9 @@ const typeDefs = gql`
     }
 
     type Invite {
-        shareLink: String
+        _id: String
+        owner: String
+        tableID: String
     }
 
     type Query {
@@ -65,9 +69,9 @@ const typeDefs = gql`
         register(email: String!, password: String!): Token
         login(email: String!, password: String!): Token
         createTimetable(email: String!, title: String!): Timetable
-        deleteTimetable(tableId: String!): Timetable
-        createInvite(tableId: String!): Invite
-        inviteUser(inviteId: String!): Boolean
+        deleteTimetable(email: String!, tableID: String!): Timetable
+        createInvite(tableID: String!): Invite
+        inviteUser(inviteID: String!): Boolean
     }
 `
 
@@ -77,7 +81,7 @@ const resolvers = {
             if(_context.user && _context.user.id) {
                 return _context.db
                 .collection('users')
-                .findOne({_id: ObjectId(_context.user.id)})
+                .findOne({_id: ObjectID(_context.user.id)})
                 .then((data) => {
                     console.log(data);
                     return data
@@ -90,9 +94,9 @@ const resolvers = {
         async timetables(_parent, _args, _context, _info) {
             if(_context.user && _context.user.id) {
                 const user = await _context.db.collection('users')
-                .findOne({_id: ObjectId(_context.user.id)})
+                .findOne({_id: ObjectID(_context.user.id)})
                 .then((data) => {
-                    return data
+                    return data;
                 });
                 const timetableArray = await _context.db.collection('timetables').find({_id: {$in: user.timetables}}).sort({_id: -1}).toArray();
                 return timetableArray;
@@ -120,6 +124,7 @@ const resolvers = {
                 email: email,
                 password: hash,
                 timetables: [],
+                sharedTimetables: [],
                 salt: salt
             }).then(({ ops }) => ops[0]);
             
@@ -180,8 +185,69 @@ const resolvers = {
             }
         },
 
-        async deleteTimetable(_parent, _args, _context) {
+        async deleteTimetable(_parent, { tableID, email }, _context) {
+            if(_context.user && _context.user.id) {
+                const table = _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                if (!table) throw new Error("Timetable does not exist");
 
+                if (table.userID != email){
+                    // TODO: Should alert the user that only the owner can delete the timetable
+                    return null;
+                } 
+                await _context.db.collection('timetables').findOneAndDelete({_id: ObjectID(tableID)});
+                _context.db.collection('users').updateOne({ timetables: ObjectID(tableID) }, { $pull: { timetables: ObjectID(tableID)}},
+                    function (err, userDocs) {
+                        if (err) throw new Error(err);
+                        pusher.trigger('timetable-channel', 'timetable-change', email);
+                    });
+                _context.db.collection('users').updateMany({ sharedTimetables: ObjectID(tableID) }, { $pull: { sharedTimetables: ObjectID(tableID)}},
+                    function (err, userDocs) {
+                        if (err) throw new Error(err);
+                        pusher.trigger('timetable-channel', 'timetable-change', email);
+                    });
+                
+                return table;
+            } else {
+                return null;
+            }
+        },
+
+        async createInvite(_parent, { tableID }, _context) {
+            if(_context.user && _context.user.id) {
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+                console.log(user);
+                const table = await _context.db.collection('timetables').findOne({_id: ObjectID(tableID)});
+                if (!table) throw new Error("Timetable does not exist");
+                const timetableInvite = await _context.db.collection('timetableInvites').findOne({tableID});
+                if (!timetableInvite) {
+                    const newInvite = await _context.db.collection('timetableInvites').insertOne({tableID: tableID, owner: user.email})
+                        .then(({ ops }) => ops[0]);
+                    return newInvite;
+                }
+                return timetableInvite;
+            } else {
+                return null;
+            }
+        },
+
+        async inviteUser(_parent, { inviteID }, _context) {
+            if(_context.user && _context.user.id) {
+                const user = await _context.db.collection('users').findOne({_id: ObjectID(_context.user.id)})
+                .then((data) => {
+                    return data;
+                });
+                const timetableInvite = await _context.db.collection('timetableInvites').findOne({_id: ObjectId(inviteID)})
+                if (!timetableInvite) {
+                    throw new Error("Invite does not exist");
+                } else {
+                    const updatedUser = await _context.db.collection('users').updateOne({_id: ObjectID(_context.user.id)},
+                        { $addToSet: {sharedTimetables : ObjectId(timetableInvite.tableID) }});
+                    return !!updatedUser;
+                }
+            }
         }
     },
     Date: dateScalar,
