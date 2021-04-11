@@ -244,7 +244,7 @@ const resolvers = {
                     _context.db.collection('users').updateOne({email: user.email},{ $addToSet: {timetables : ops[0]._id }},
                         function(err, updatedUser) {
                             // if (err) return res.status(500).end(err);
-                            pusher.trigger('timetable-channel', 'timetable-change', user.email);
+                            pusher.trigger('timetable-channel', 'timetable-change', {email: user.email, tableID: timetableDoc._id});
                     });
 
                     return ops[0];
