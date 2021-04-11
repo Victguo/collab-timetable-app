@@ -269,7 +269,7 @@ const resolvers = {
                     return null;
                 } 
                 await _context.db.collection('timetables').findOneAndDelete({_id: ObjectID(tableID)});
-                pusher.trigger('timetable-channel', 'timetable-change', {email: user.email, tableID: table._id} );
+                pusher.trigger('timetable-channel', 'timetable-change', {email: user.email, tableID: tableID} );
                 _context.db.collection('users').updateOne({ timetables: ObjectID(tableID) }, { $pull: { timetables: ObjectID(tableID)}},
                     function (err, userDocs) {
                         if (err) throw new Error(err);
