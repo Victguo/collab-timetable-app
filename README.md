@@ -1,5 +1,6 @@
 # Project DiamondHands
 - deployed on https://team-diamondhands.vercel.app 
+- demo link: https://youtu.be/FgKPXnBEq9Y
 
 ## Team members
 - Joe Liu
